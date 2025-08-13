@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // API base URL
-  const API_BASE = "https://indian-coffee-house.onrender.com/";
+  const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
 
   useEffect(() => {
     if (token) {
