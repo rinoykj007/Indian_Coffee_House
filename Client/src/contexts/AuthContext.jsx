@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // API base URL
-  const API_BASE = "https://indian-coffee-house.vercel.app/";
+  const API_BASE = "https://indian-coffee-house.onrender.com/api";
 
   useEffect(() => {
     if (token) {
