@@ -90,7 +90,7 @@ export default function Menu({ menuRef }) {
         </p>
         <div className="mt-6">
           <Link
-            to="/menu"
+            to="/MenuList"
             className="a-CTA inline-block bg-gradient-to-r from-amber-600 to-orange-600 text-white px-8 py-3 rounded-full font-semibold hover:from-amber-700 hover:to-orange-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             View The Full Menu

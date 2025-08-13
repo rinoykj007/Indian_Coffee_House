@@ -3,6 +3,7 @@ import axios from "axios";
 import FloatingCartButton from "./components/FloatingCartButton";
 import OrderPopup from "./components/OrderPopup";
 import HeaderSection from "./components/HeaderSection";
+import MenuItemCard from "./components/MenuItemCard";
 
 export default function Meanulist() {
   // Complete order handler
@@ -48,9 +49,14 @@ export default function Meanulist() {
 
   useEffect(() => {
     axios
-      .get("https://indian-coffee-house.onrender.com/menu")
+      .get(`${import.meta.env.VITE_API_URL}/api/menu`)
       .then((res) => {
-        setMenu(res.data);
+        console.log("Menu data from backend:", res.data);
+        let menuData = res.data.menuItems || res.data;
+        if (!Array.isArray(menuData)) {
+          menuData = [menuData];
+        }
+        setMenu(menuData);
         setLoading(false);
       })
       .catch((err) => {
@@ -93,67 +99,10 @@ export default function Meanulist() {
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap justify-center gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 px-4">
           {filteredMenu.map((item) => (
-            <div
-              key={item._id || item.id}
-              className="bg-white border border-amber-200 rounded-2xl shadow-lg w-56 mb-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-amber-300 flex flex-col"
-            >
-              <img
-                src={
-                  item.image ||
-                  "https://via.placeholder.com/220x120?text=No+Image"
-                }
-                alt={item.name || "No Name"}
-                className="w-full h-32 object-cover rounded-t-2xl border-b border-amber-100"
-              />
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="font-semibold text-lg mb-2 text-slate-800">
-                    {item.name || "N/A"}
-                  </div>
-                  <div className="flex items-center gap-4 mb-2">
-                    <span className="flex items-center text-amber-600 text-sm">
-                      <svg
-                        width="18"
-                        height="18"
-                        fill="none"
-                        stroke="#d97706"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        className="mr-1"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 6v6l4 2" />
-                      </svg>
-                      {item.preparationTime || "N/A"}
-                    </span>
-                    <span className="flex items-center text-orange-500 text-sm">
-                      <svg
-                        width="18"
-                        height="18"
-                        fill="none"
-                        stroke="#ea580c"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        className="mr-1"
-                      >
-                        <polygon points="12,2 15,8.5 22,9.3 17,14.1 18.5,21 12,17.8 5.5,21 7,14.1 2,9.3 9,8.5" />
-                      </svg>
-                      {item.rating ? item.rating : "N/A"}
-                    </span>
-                  </div>
-                  <div className="font-bold text-xl text-orange-600 mb-4">
-                    {item.price ? `${item.price.toFixed(2)}$` : "N/A"}
-                  </div>
-                </div>
-                <button
-                  className="mt-auto bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all duration-200 w-full font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
-                  onClick={() => addToCart(item)}
-                >
-                  Add to Cart
-                </button>
-              </div>
+            <div key={item._id || item.id} className="flex justify-center">
+              <MenuItemCard item={item} addToCart={addToCart} />
             </div>
           ))}
         </div>

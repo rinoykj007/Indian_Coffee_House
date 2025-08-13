@@ -44,7 +44,7 @@ export default function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/menu" element={<MenuList />} />
+          <Route path="/MenuList" element={<MenuList />} />
           <Route path="/management/*" element={<ManagementApp />} />
           {/* Catch old routes and redirect */}
           <Route
