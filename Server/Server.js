@@ -14,10 +14,10 @@ const paymentRoutes = require("./routes/payments");
 const app = express();
 
 // Middleware
-// Middleware
 const allowedOrigins = [
   "https://indian-coffee-house-v5l9jy13d-rinoykj007s-projects.vercel.app",
   "https://indian-coffee-house-hxyp.vercel.app",
+  "http://localhost:5173",
 ];
 
 app.use(

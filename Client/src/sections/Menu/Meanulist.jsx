@@ -48,7 +48,7 @@ export default function Meanulist() {
 
   useEffect(() => {
     axios
-      .get("https://indian-coffee-house-3.onrender.com/menu")
+      .get("https://indian-coffee-house.onrender.com/menu")
       .then((res) => {
         setMenu(res.data);
         setLoading(false);

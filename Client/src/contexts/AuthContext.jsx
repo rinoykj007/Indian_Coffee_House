@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // API base URL
-  const API_BASE = process.env.REACT_APP_API_BASE || "https://indian-coffee-house-3.onrender.com/api";
+  const API_BASE = "https://indian-coffee-house.onrender.com/";
 
   useEffect(() => {
     if (token) {
