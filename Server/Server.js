@@ -14,10 +14,21 @@ const paymentRoutes = require("./routes/payments");
 const app = express();
 
 // Middleware
+// Middleware
+const allowedOrigins = [
+  "https://indian-coffee-house-v5l9jy13d-rinoykj007s-projects.vercel.app",
+  "https://indian-coffee-house-hxyp.vercel.app",
+];
+
 app.use(
   cors({
-    origin:
-      "https://indian-coffee-house-v5l9jy13d-rinoykj007s-projects.vercel.app",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
