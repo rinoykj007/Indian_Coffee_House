@@ -14,7 +14,13 @@ const paymentRoutes = require("./routes/payments");
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin:
+      "https://indian-coffee-house-v5l9jy13d-rinoykj007s-projects.vercel.app",
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
