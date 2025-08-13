@@ -354,6 +354,18 @@ const MenuPage = () => {
                   key={item._id}
                   className="bg-white rounded-xl shadow-lg border border-amber-100 overflow-hidden hover:shadow-xl transition-shadow"
                 >
+                  {/* Item Image */}
+                  {item.image && (
+                    <div className="h-48 overflow-hidden">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">

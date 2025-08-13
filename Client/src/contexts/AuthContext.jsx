@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -14,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // API base URL
   const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
@@ -80,6 +82,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
+    // Redirect to login page after logout
+    navigate("/management/login");
   };
 
   const isAdmin = () => {
