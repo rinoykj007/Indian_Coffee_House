@@ -48,7 +48,7 @@ export default function Meanulist() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/menu")
+      .get("https://indian-coffee-house.vercel.app/menu")
       .then((res) => {
         setMenu(res.data);
         setLoading(false);
