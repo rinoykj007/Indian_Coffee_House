@@ -32,21 +32,21 @@ const AdminDashboard = () => {
   const [recentOrders, setRecentOrders] = useState([]);
   const [showAddMenuItem, setShowAddMenuItem] = useState(false);
   const [showAddStaff, setShowAddStaff] = useState(false);
-  
+
   // Form states for adding new items
   const [newMenuItem, setNewMenuItem] = useState({
-    name: '',
-    type: '',
-    price: '',
-    description: '',
-    available: true
+    name: "",
+    type: "",
+    price: "",
+    description: "",
+    available: true,
   });
-  
+
   const [newStaffMember, setNewStaffMember] = useState({
-    username: '',
-    password: '',
-    role: 'staff',
-    name: ''
+    username: "",
+    password: "",
+    role: "staff",
+    name: "",
   });
 
   useEffect(() => {
@@ -101,10 +101,16 @@ const AdminDashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newMenuItem),
       });
-      
+
       if (response.ok) {
         alert("Menu item added successfully!");
-        setNewMenuItem({ name: '', type: '', price: '', description: '', available: true });
+        setNewMenuItem({
+          name: "",
+          type: "",
+          price: "",
+          description: "",
+          available: true,
+        });
         setShowAddMenuItem(false);
         fetchTabData(); // Refresh menu items
       } else {
@@ -124,10 +130,15 @@ const AdminDashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newStaffMember),
       });
-      
+
       if (response.ok) {
         alert("Staff member added successfully!");
-        setNewStaffMember({ username: '', password: '', role: 'staff', name: '' });
+        setNewStaffMember({
+          username: "",
+          password: "",
+          role: "staff",
+          name: "",
+        });
         setShowAddStaff(false);
         fetchTabData(); // Refresh staff list
       } else {
@@ -167,7 +178,7 @@ const AdminDashboard = () => {
         menuData,
         ordersData,
         paymentsData,
-        usersData: usersData?.length
+        usersData: usersData?.length,
       });
 
       setStats({
@@ -212,19 +223,21 @@ const AdminDashboard = () => {
   const QuickAction = ({ title, description, icon: Icon, onClick, color }) => (
     <button
       onClick={onClick}
-      className="bg-white rounded-xl shadow-lg p-6 border border-amber-200 hover:shadow-xl transition-all duration-300 hover:scale-105 text-left w-full"
+      className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-amber-200 hover:shadow-xl transition-all duration-300 hover:scale-105 text-left w-full"
     >
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3 sm:space-x-4">
         <div
-          className={`p-3 rounded-full ${color
+          className={`p-2 sm:p-3 rounded-full ${color
             .replace("text-", "bg-")
             .replace("-600", "-100")}`}
         >
-          <Icon className={`w-6 h-6 ${color}`} />
+          <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${color}`} />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-800">{title}</h3>
-          <p className="text-slate-600 text-sm">{description}</p>
+          <h3 className="text-sm sm:text-base font-semibold text-slate-800">
+            {title}
+          </h3>
+          <p className="text-slate-600 text-xs sm:text-sm">{description}</p>
         </div>
       </div>
     </button>
@@ -374,7 +387,9 @@ const AdminDashboard = () => {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-slate-800">Menu Management</h2>
+              <h2 className="text-[1rem] font-bold text-slate-800">
+                Menu Management
+              </h2>
               <button
                 onClick={() => setShowAddMenuItem(true)}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
@@ -388,23 +403,39 @@ const AdminDashboard = () => {
             {showAddMenuItem && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                  <h3 className="text-lg font-semibold text-slate-800 mb-4">Add New Menu Item</h3>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-4">
+                    Add New Menu Item
+                  </h3>
                   <form onSubmit={handleAddMenuItem} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Name
+                      </label>
                       <input
                         type="text"
                         value={newMenuItem.name}
-                        onChange={(e) => setNewMenuItem({...newMenuItem, name: e.target.value})}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            name: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Type
+                      </label>
                       <select
                         value={newMenuItem.type}
-                        onChange={(e) => setNewMenuItem({...newMenuItem, type: e.target.value})}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            type: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         required
                       >
@@ -417,20 +448,34 @@ const AdminDashboard = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Price (₹)</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Price (₹)
+                      </label>
                       <input
                         type="number"
                         value={newMenuItem.price}
-                        onChange={(e) => setNewMenuItem({...newMenuItem, price: e.target.value})}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            price: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Description
+                      </label>
                       <textarea
                         value={newMenuItem.description}
-                        onChange={(e) => setNewMenuItem({...newMenuItem, description: e.target.value})}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            description: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         rows="3"
                       />
@@ -439,10 +484,17 @@ const AdminDashboard = () => {
                       <input
                         type="checkbox"
                         checked={newMenuItem.available}
-                        onChange={(e) => setNewMenuItem({...newMenuItem, available: e.target.checked})}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            available: e.target.checked,
+                          })
+                        }
                         className="rounded"
                       />
-                      <label className="text-sm text-slate-700">Available</label>
+                      <label className="text-sm text-slate-700">
+                        Available
+                      </label>
                     </div>
                     <div className="flex space-x-4">
                       <button
@@ -467,16 +519,31 @@ const AdminDashboard = () => {
             {/* Menu Items Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {menuItems.map((item) => (
-                <div key={item._id} className="bg-white rounded-lg shadow-lg border border-amber-200 p-4">
+                <div
+                  key={item._id}
+                  className="bg-white rounded-lg shadow-lg border border-amber-200 p-4"
+                >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-slate-800">{item.name}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs ${item.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {item.available ? 'Available' : 'Unavailable'}
+                    <h3 className="font-semibold text-slate-800">
+                      {item.name}
+                    </h3>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        item.available
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {item.available ? "Available" : "Unavailable"}
                     </span>
                   </div>
                   <p className="text-sm text-slate-600 mb-2">{item.type}</p>
-                  <p className="text-lg font-bold text-amber-600">₹{item.price}</p>
-                  <p className="text-sm text-slate-600 mt-2">{item.description}</p>
+                  <p className="text-lg font-bold text-amber-600">
+                    ₹{item.price}
+                  </p>
+                  <p className="text-sm text-slate-600 mt-2">
+                    {item.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -487,7 +554,9 @@ const AdminDashboard = () => {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-slate-800">Staff Management</h2>
+              <h2 className="text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold text-slate-800">
+                Staff Management
+              </h2>
               <button
                 onClick={() => setShowAddStaff(true)}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
@@ -501,43 +570,73 @@ const AdminDashboard = () => {
             {showAddStaff && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                  <h3 className="text-lg font-semibold text-slate-800 mb-4">Add New Staff Member</h3>
+                  <h3 className="text-lg font-semibold text-slate-800 mb-4">
+                    Add New Staff Member
+                  </h3>
                   <form onSubmit={handleAddStaff} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Full Name
+                      </label>
                       <input
                         type="text"
                         value={newStaffMember.name}
-                        onChange={(e) => setNewStaffMember({...newStaffMember, name: e.target.value})}
+                        onChange={(e) =>
+                          setNewStaffMember({
+                            ...newStaffMember,
+                            name: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Username
+                      </label>
                       <input
                         type="text"
                         value={newStaffMember.username}
-                        onChange={(e) => setNewStaffMember({...newStaffMember, username: e.target.value})}
+                        onChange={(e) =>
+                          setNewStaffMember({
+                            ...newStaffMember,
+                            username: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Password
+                      </label>
                       <input
                         type="password"
                         value={newStaffMember.password}
-                        onChange={(e) => setNewStaffMember({...newStaffMember, password: e.target.value})}
+                        onChange={(e) =>
+                          setNewStaffMember({
+                            ...newStaffMember,
+                            password: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Role
+                      </label>
                       <select
                         value={newStaffMember.role}
-                        onChange={(e) => setNewStaffMember({...newStaffMember, role: e.target.value})}
+                        onChange={(e) =>
+                          setNewStaffMember({
+                            ...newStaffMember,
+                            role: e.target.value,
+                          })
+                        }
                         className="w-full p-2 border border-slate-300 rounded-lg"
                       >
                         <option value="staff">Staff</option>
@@ -572,23 +671,42 @@ const AdminDashboard = () => {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-amber-200">
-                        <th className="text-left py-3 px-4 font-semibold text-slate-800">Name</th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-800">Username</th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-800">Role</th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-800">Status</th>
+                        <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                          Name
+                        </th>
+                        <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                          Username
+                        </th>
+                        <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                          Role
+                        </th>
+                        <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                          Status
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {staffMembers.map((staff) => (
-                        <tr key={staff._id} className="border-b border-amber-100">
-                          <td className="py-3 px-4 text-slate-800">{staff.name || staff.username}</td>
-                          <td className="py-3 px-4 text-slate-600">{staff.username}</td>
+                        <tr
+                          key={staff._id}
+                          className="border-b border-amber-100"
+                        >
+                          <td className="py-3 px-4 text-slate-800">
+                            {staff.name || staff.username}
+                          </td>
+                          <td className="py-3 px-4 text-slate-600">
+                            {staff.username}
+                          </td>
                           <td className="py-3 px-4">
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              staff.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                              staff.role === 'kitchen' ? 'bg-orange-100 text-orange-800' :
-                              'bg-blue-100 text-blue-800'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs ${
+                                staff.role === "admin"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : staff.role === "kitchen"
+                                  ? "bg-orange-100 text-orange-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
                               {staff.role}
                             </span>
                           </td>
@@ -610,29 +728,41 @@ const AdminDashboard = () => {
       case "tables":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-800">Table Management</h2>
+            <h2 className="text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold text-slate-800">
+              Table Management
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {tables.map((table) => (
                 <div
                   key={table._id}
                   className={`p-4 rounded-lg border-2 ${
-                    table.status === 'available'
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
+                    table.status === "available"
+                      ? "bg-green-50 border-green-200"
+                      : "bg-red-50 border-red-200"
                   }`}
                 >
                   <div className="text-center">
-                    <Table className={`w-8 h-8 mx-auto mb-2 ${
-                      table.status === 'available' ? 'text-green-600' : 'text-red-600'
-                    }`} />
-                    <h3 className="font-semibold text-slate-800">Table {table.tableNumber}</h3>
-                    <p className="text-sm text-slate-600">{table.capacity} guests</p>
+                    <Table
+                      className={`w-8 h-8 mx-auto mb-2 ${
+                        table.status === "available"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    />
+                    <h3 className="font-semibold text-slate-800">
+                      Table {table.tableNumber}
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      {table.capacity} guests
+                    </p>
                     <p className="text-sm text-slate-600">{table.location}</p>
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${
-                      table.status === 'available'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${
+                        table.status === "available"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {table.status}
                     </span>
                   </div>
@@ -646,7 +776,9 @@ const AdminDashboard = () => {
         return (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Recent Orders</h2>
+              <h2 className="text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold text-slate-800">
+                Recent Orders
+              </h2>
               <div className="text-sm text-slate-600">
                 Total Orders: {recentOrders.length}
               </div>
@@ -655,8 +787,12 @@ const AdminDashboard = () => {
             {recentOrders.length === 0 ? (
               <div className="bg-white rounded-lg shadow-lg border border-amber-200 p-8 text-center">
                 <ShoppingCart className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-slate-600 mb-2">No Orders Yet</h3>
-                <p className="text-slate-500">Orders will appear here when customers place them.</p>
+                <h3 className="text-lg font-semibold text-slate-600 mb-2">
+                  No Orders Yet
+                </h3>
+                <p className="text-slate-500">
+                  Orders will appear here when customers place them.
+                </p>
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-lg border border-amber-200">
@@ -665,22 +801,40 @@ const AdminDashboard = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-amber-200">
-                          <th className="text-left py-3 px-4 font-semibold text-slate-800">Order ID</th>
-                          <th className="text-left py-3 px-4 font-semibold text-slate-800">Table</th>
-                          <th className="text-left py-3 px-4 font-semibold text-slate-800">Items</th>
-                          <th className="text-left py-3 px-4 font-semibold text-slate-800">Total</th>
-                          <th className="text-left py-3 px-4 font-semibold text-slate-800">Status</th>
-                          <th className="text-left py-3 px-4 font-semibold text-slate-800">Time</th>
+                          <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                            Order ID
+                          </th>
+                          <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                            Table
+                          </th>
+                          <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                            Items
+                          </th>
+                          <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                            Total
+                          </th>
+                          <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                            Status
+                          </th>
+                          <th className="text-left py-3 px-4 font-semibold text-slate-800">
+                            Time
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {recentOrders.map((order) => (
-                          <tr key={order._id} className="border-b border-amber-100 hover:bg-amber-50">
+                          <tr
+                            key={order._id}
+                            className="border-b border-amber-100 hover:bg-amber-50"
+                          >
                             <td className="py-3 px-4 text-slate-800 font-mono text-sm">
-                              #{order._id?.slice(-6) || 'N/A'}
+                              #{order._id?.slice(-6) || "N/A"}
                             </td>
                             <td className="py-3 px-4 text-slate-600">
-                              Table {order.table?.tableNumber || order.tableNumber || 'N/A'}
+                              Table{" "}
+                              {order.table?.tableNumber ||
+                                order.tableNumber ||
+                                "N/A"}
                             </td>
                             <td className="py-3 px-4 text-slate-600">
                               {order.items?.length || 0} items
@@ -689,17 +843,24 @@ const AdminDashboard = () => {
                               ₹{order.total || 0}
                             </td>
                             <td className="py-3 px-4">
-                              <span className={`px-2 py-1 rounded-full text-xs ${
-                                order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                order.status === 'preparing' ? 'bg-yellow-100 text-yellow-800' :
-                                order.status === 'pending' ? 'bg-blue-100 text-blue-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {order.status || 'pending'}
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  order.status === "completed"
+                                    ? "bg-green-100 text-green-800"
+                                    : order.status === "preparing"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : order.status === "pending"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}
+                              >
+                                {order.status || "pending"}
                               </span>
                             </td>
                             <td className="py-3 px-4 text-slate-500 text-sm">
-                              {order.orderDate ? new Date(order.orderDate).toLocaleString() : 'N/A'}
+                              {order.orderDate
+                                ? new Date(order.orderDate).toLocaleString()
+                                : "N/A"}
                             </td>
                           </tr>
                         ))}
@@ -716,7 +877,9 @@ const AdminDashboard = () => {
         return (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Reports & Analytics</h2>
+              <h2 className="text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold text-slate-800">
+                Reports & Analytics
+              </h2>
               <div className="text-sm text-slate-600">
                 {new Date().toLocaleDateString()}
               </div>
@@ -727,13 +890,19 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium">Today's Orders</p>
+                    <p className="text-slate-600 text-sm font-medium">
+                      Today's Orders
+                    </p>
                     <p className="text-3xl font-bold text-blue-600 mt-1">
-                      {recentOrders.filter(order => {
-                        const orderDate = new Date(order.orderDate);
-                        const today = new Date();
-                        return orderDate.toDateString() === today.toDateString();
-                      }).length}
+                      {
+                        recentOrders.filter((order) => {
+                          const orderDate = new Date(order.orderDate);
+                          const today = new Date();
+                          return (
+                            orderDate.toDateString() === today.toDateString()
+                          );
+                        }).length
+                      }
                     </p>
                   </div>
                   <div className="p-3 rounded-full bg-blue-100">
@@ -745,16 +914,20 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium">Today's Revenue</p>
+                    <p className="text-slate-600 text-sm font-medium">
+                      Today's Revenue
+                    </p>
                     <p className="text-3xl font-bold text-green-600 mt-1">
-                      ₹{recentOrders
-                        .filter(order => {
+                      ₹
+                      {recentOrders
+                        .filter((order) => {
                           const orderDate = new Date(order.orderDate);
                           const today = new Date();
-                          return orderDate.toDateString() === today.toDateString();
+                          return (
+                            orderDate.toDateString() === today.toDateString()
+                          );
                         })
-                        .reduce((sum, order) => sum + (order.total || 0), 0)
-                      }
+                        .reduce((sum, order) => sum + (order.total || 0), 0)}
                     </p>
                   </div>
                   <div className="p-3 rounded-full bg-green-100">
@@ -766,12 +939,19 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm font-medium">Avg Order Value</p>
+                    <p className="text-slate-600 text-sm font-medium">
+                      Avg Order Value
+                    </p>
                     <p className="text-3xl font-bold text-amber-600 mt-1">
-                      ₹{recentOrders.length > 0 
-                        ? Math.round(recentOrders.reduce((sum, order) => sum + (order.total || 0), 0) / recentOrders.length)
-                        : 0
-                      }
+                      ₹
+                      {recentOrders.length > 0
+                        ? Math.round(
+                            recentOrders.reduce(
+                              (sum, order) => sum + (order.total || 0),
+                              0
+                            ) / recentOrders.length
+                          )
+                        : 0}
                     </p>
                   </div>
                   <div className="p-3 rounded-full bg-amber-100">
@@ -783,27 +963,48 @@ const AdminDashboard = () => {
 
             {/* Order Status Breakdown */}
             <div className="bg-white rounded-lg shadow-lg border border-amber-200 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Order Status Breakdown</h3>
+              <h3 className="text-lg font-semibold text-slate-800 mb-4">
+                Order Status Breakdown
+              </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['pending', 'preparing', 'completed', 'cancelled'].map(status => {
-                  const count = recentOrders.filter(order => order.status === status).length;
-                  const percentage = recentOrders.length > 0 ? Math.round((count / recentOrders.length) * 100) : 0;
-                  
-                  return (
-                    <div key={status} className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className={`text-2xl font-bold mb-1 ${
-                        status === 'completed' ? 'text-green-600' :
-                        status === 'preparing' ? 'text-yellow-600' :
-                        status === 'pending' ? 'text-blue-600' :
-                        'text-red-600'
-                      }`}>
-                        {count}
+                {["pending", "preparing", "completed", "cancelled"].map(
+                  (status) => {
+                    const count = recentOrders.filter(
+                      (order) => order.status === status
+                    ).length;
+                    const percentage =
+                      recentOrders.length > 0
+                        ? Math.round((count / recentOrders.length) * 100)
+                        : 0;
+
+                    return (
+                      <div
+                        key={status}
+                        className="text-center p-4 bg-slate-50 rounded-lg"
+                      >
+                        <div
+                          className={`text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold mb-1 ${
+                            status === "completed"
+                              ? "text-green-600"
+                              : status === "preparing"
+                              ? "text-yellow-600"
+                              : status === "pending"
+                              ? "text-blue-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {count}
+                        </div>
+                        <div className="text-sm text-slate-600 capitalize">
+                          {status}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {percentage}%
+                        </div>
                       </div>
-                      <div className="text-sm text-slate-600 capitalize">{status}</div>
-                      <div className="text-xs text-slate-500">{percentage}%</div>
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
               </div>
             </div>
           </div>
@@ -825,8 +1026,12 @@ const AdminDashboard = () => {
                 <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">Admin Dashboard</h1>
-                <p className="text-xs sm:text-sm text-slate-600">Welcome back, {user?.username || 'Admin'}</p>
+                <h1 className="text-lg sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold text-slate-800">
+                  Admin Dashboard
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  Welcome back, {user?.username || "Admin"}
+                </p>
               </div>
             </div>
             <button
@@ -845,20 +1050,20 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8 overflow-x-auto">
             {[
-              { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'tables', label: 'Tables', icon: Table },
-              { id: 'menu', label: 'Menu', icon: Coffee },
-              { id: 'staff', label: 'Staff', icon: Users },
-              { id: 'orders', label: 'Orders', icon: ShoppingCart },
-              { id: 'reports', label: 'Reports', icon: TrendingUp },
+              { id: "overview", label: "Overview", icon: BarChart3 },
+              { id: "tables", label: "Tables", icon: Table },
+              { id: "menu", label: "Menu", icon: Coffee },
+              { id: "staff", label: "Staff", icon: Users },
+              { id: "orders", label: "Orders", icon: ShoppingCart },
+              { id: "reports", label: "Reports", icon: TrendingUp },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'border-amber-600 text-amber-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    ? "border-amber-600 text-amber-600"
+                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
