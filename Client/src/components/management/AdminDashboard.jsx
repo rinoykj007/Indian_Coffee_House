@@ -819,21 +819,21 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-amber-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-amber-600 p-2 rounded-full">
-                <Coffee className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="bg-amber-600 p-1.5 sm:p-2 rounded-full">
+                <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
-                <p className="text-sm text-slate-600">Welcome back, {user?.username || 'Admin'}</p>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">Admin Dashboard</h1>
+                <p className="text-xs sm:text-sm text-slate-600">Welcome back, {user?.username || 'Admin'}</p>
               </div>
             </div>
             <button
               onClick={logout}
-              className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+              className="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2 text-sm sm:text-base"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Logout</span>
             </button>
           </div>

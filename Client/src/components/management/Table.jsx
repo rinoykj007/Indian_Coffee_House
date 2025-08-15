@@ -212,16 +212,16 @@ const Table = () => {
     <div className="min-h-screen bg-amber-50 p-4">
       {/* Header */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-amber-600 p-2 rounded-lg">
-              <Coffee className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-amber-600 p-1.5 sm:p-2 rounded-lg">
+              <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
                 Staff Dashboard
               </h1>
-              <p className="text-slate-600">
+              <p className="text-sm sm:text-base text-slate-600">
                 Welcome, {user?.name || user?.username}
               </p>
             </div>
@@ -229,9 +229,9 @@ const Table = () => {
 
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-2 bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded"
+            className="flex items-center space-x-2 bg-slate-600 hover:bg-slate-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded text-sm sm:text-base"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Logout</span>
           </button>
         </div>
