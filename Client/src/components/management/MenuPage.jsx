@@ -146,35 +146,26 @@ const MenuPage = () => {
         location.state?.isAdditionalOrder && existingOrder;
 
       if (isAdditionalOrder) {
-        // Combine existing order items with new items
-        const combinedItems = [
-          ...existingOrder.items,
-          ...orderItems.map((item) => ({
-            menuItemId: item._id,
-            quantity: item.quantity,
-            price: item.price,
-            name: item.name,
-            specialNotes: "",
-          })),
-        ];
-
-        // Calculate total for combined order
-        const combinedTotal = combinedItems.reduce(
-          (sum, item) => sum + item.quantity * item.price,
-          0
-        );
+        // Only send NEW items for update - backend will handle combining
+        const newItems = orderItems.map((item) => ({
+          menuItemId: item._id,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+          specialNotes: "",
+        }));
 
         finalOrderData = {
           tableId: tableId,
-          items: combinedItems,
+          items: newItems, // Only send new items
           customerCount: existingOrder.customerCount || 1,
           specialRequests: existingOrder.specialRequests || "",
-          total: combinedTotal,
           orderId: existingOrder.id,
           isUpdate: true,
         };
 
-        console.log("Adding items to existing order:", finalOrderData);
+        console.log("Adding NEW items to existing order:", finalOrderData);
+        console.log("New items only:", newItems);
       } else {
         // New order
         const newItems = orderItems.map((item) => ({
