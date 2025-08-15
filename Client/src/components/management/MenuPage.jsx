@@ -33,7 +33,7 @@ const MenuPage = () => {
 
   // Get the actual table ID for API calls
   const tableId = location.state?.tableId;
-  
+
   // Debug: Log navigation state and table ID
   console.log("=== MENUPAGE DEBUG ===");
   console.log("Location state:", location.state);
@@ -44,7 +44,7 @@ const MenuPage = () => {
 
   useEffect(() => {
     fetchMenuItems();
-    
+
     // If this is an additional order, fetch existing order for this table
     if (location.state?.isAdditionalOrder && tableId) {
       fetchExistingOrder();
@@ -54,16 +54,18 @@ const MenuPage = () => {
   const fetchExistingOrder = async () => {
     setIsLoadingExistingOrder(true);
     try {
-      const response = await makeAuthenticatedRequest(`/orders/table/${tableId}`);
+      const response = await makeAuthenticatedRequest(
+        `/orders/table/${tableId}`
+      );
       if (response.ok) {
         const data = await response.json();
         if (data.order) {
           setExistingOrder(data.order);
-          console.log('Existing order found:', data.order);
+          console.log("Existing order found:", data.order);
         }
       }
     } catch (error) {
-      console.error('Error fetching existing order:', error);
+      console.error("Error fetching existing order:", error);
     } finally {
       setIsLoadingExistingOrder(false);
     }
@@ -77,7 +79,7 @@ const MenuPage = () => {
     try {
       const response = await makeAuthenticatedRequest("/menu");
       const data = await response.json();
-      
+
       // Handle both old format (array) and new format (object with menuItems)
       const menuItemsArray = Array.isArray(data) ? data : data.menuItems || [];
       setMenuItems(menuItemsArray.filter((item) => item.isAvailable));
@@ -140,7 +142,8 @@ const MenuPage = () => {
 
     try {
       let finalOrderData;
-      const isAdditionalOrder = location.state?.isAdditionalOrder && existingOrder;
+      const isAdditionalOrder =
+        location.state?.isAdditionalOrder && existingOrder;
 
       if (isAdditionalOrder) {
         // Combine existing order items with new items
@@ -152,12 +155,13 @@ const MenuPage = () => {
             price: item.price,
             name: item.name,
             specialNotes: "",
-          }))
+          })),
         ];
 
         // Calculate total for combined order
-        const combinedTotal = combinedItems.reduce((sum, item) => 
-          sum + (item.quantity * item.price), 0
+        const combinedTotal = combinedItems.reduce(
+          (sum, item) => sum + item.quantity * item.price,
+          0
         );
 
         finalOrderData = {
@@ -167,7 +171,7 @@ const MenuPage = () => {
           specialRequests: existingOrder.specialRequests || "",
           total: combinedTotal,
           orderId: existingOrder.id,
-          isUpdate: true
+          isUpdate: true,
         };
 
         console.log("Adding items to existing order:", finalOrderData);
@@ -187,23 +191,23 @@ const MenuPage = () => {
           customerCount: 1,
           specialRequests: "",
           total: orderTotal,
-          isUpdate: false
+          isUpdate: false,
         };
 
         console.log("Creating new order:", finalOrderData);
       }
 
       console.log("Submitting order data:", finalOrderData);
-    
-    const response = await makeAuthenticatedRequest("/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(finalOrderData),
-    });
 
-    console.log("Order submission response status:", response.status);
+      const response = await makeAuthenticatedRequest("/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalOrderData),
+      });
 
-    if (response.ok) {
+      console.log("Order submission response status:", response.status);
+
+      if (response.ok) {
         // Update table status to occupied after successful order (only for new orders)
         if (!isAdditionalOrder) {
           try {
@@ -216,11 +220,11 @@ const MenuPage = () => {
             console.error("Error updating table status:", error);
           }
         }
-        
-        const message = isAdditionalOrder 
+
+        const message = isAdditionalOrder
           ? `Items added to Table ${tableInfo?.tableNumber}! Total: ₹${finalOrderData.total}`
           : `Order placed for Table ${tableInfo?.tableNumber}! Total: ₹${finalOrderData.total}`;
-        
+
         alert(message);
         navigate("/management/staff");
       } else {
@@ -228,9 +232,13 @@ const MenuPage = () => {
         console.error("Order submission failed:", {
           status: response.status,
           error: errorData,
-          submittedData: finalOrderData
+          submittedData: finalOrderData,
         });
-        alert(`Failed to submit order: ${errorData.error || 'Unknown error'}. Please try again.`);
+        alert(
+          `Failed to submit order: ${
+            errorData.error || "Unknown error"
+          }. Please try again.`
+        );
       }
     } catch (error) {
       console.error("Error submitting order:", error);
@@ -365,7 +373,7 @@ const MenuPage = () => {
                       />
                     </div>
                   )}
-                  
+
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">

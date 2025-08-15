@@ -107,8 +107,35 @@ router.post("/", async (req, res) => {
       });
       
       if (existingOrder) {
-        // Add new items to existing order
-        existingOrder.items.push(...items);
+        // Handle both new items and quantity updates for existing items
+        const newItems = [];
+        let updatedItemsCount = 0;
+        
+        items.forEach(newItem => {
+          const existingItem = existingOrder.items.find(existingItem => 
+            existingItem.menuItemId.toString() === newItem.menuItemId.toString()
+          );
+          
+          if (existingItem) {
+            // Item already exists - increase quantity
+            existingItem.quantity += newItem.quantity;
+            updatedItemsCount++;
+            console.log(`Updated ${newItem.name}: quantity increased to ${existingItem.quantity}`);
+          } else {
+            // New item - add to list
+            newItems.push(newItem);
+          }
+        });
+        
+        console.log('Existing items count:', existingOrder.items.length);
+        console.log('New items to add:', newItems.length);
+        console.log('Items with updated quantities:', updatedItemsCount);
+        console.log('New items:', newItems.map(item => item.name));
+        
+        if (newItems.length > 0) {
+          existingOrder.items.push(...newItems);
+        }
+        
         if (specialRequests) {
           existingOrder.specialRequests = existingOrder.specialRequests 
             ? `${existingOrder.specialRequests}; ${specialRequests}`
@@ -119,10 +146,20 @@ router.post("/", async (req, res) => {
         
         console.log('Order updated:', updatedOrder);
         
+        // Create appropriate success message
+        let message = `Order updated! Total: ₹${updatedOrder.total}`;
+        if (newItems.length > 0 && updatedItemsCount > 0) {
+          message = `${newItems.length} new items added, ${updatedItemsCount} items updated! Total: ₹${updatedOrder.total}`;
+        } else if (newItems.length > 0) {
+          message = `${newItems.length} new items added! Total: ₹${updatedOrder.total}`;
+        } else if (updatedItemsCount > 0) {
+          message = `${updatedItemsCount} items updated! Total: ₹${updatedOrder.total}`;
+        }
+        
         res.json({
           success: true,
           order: updatedOrder,
-          message: `Items added! New total: ₹${updatedOrder.total}`
+          message: message
         });
       } else {
         res.status(404).json({
