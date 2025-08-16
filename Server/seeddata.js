@@ -36,7 +36,7 @@ export const menuData = [
     name: "Fafda Jalebi",
     type: "Snack",
     image:
-      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1623653387945-2fd25214f8fc?w=400&h=300&fit=crop&crop=center",
     price: 100,
     originalPrice: null,
     rating: 4.4,
@@ -67,7 +67,7 @@ export const menuData = [
     name: "Samosa",
     type: "Snack",
     image:
-      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1565299507177-b0ac66763e7c?w=400&h=300&fit=crop&crop=center",
     price: 40,
     originalPrice: null,
     rating: 4.3,
@@ -99,7 +99,7 @@ export const menuData = [
     name: "Pakora",
     type: "Snack",
     image:
-      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1626300573055-8763168d9e7f?w=400&h=300&fit=crop&crop=center",
     price: 80,
     originalPrice: null,
     rating: 4.2,
@@ -136,7 +136,7 @@ export const menuData = [
     name: "Naan",
     type: "Bread",
     image:
-      "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1584949091598-c31daaaa4aa9?w=400&h=300&fit=crop&crop=center",
     price: 50,
     originalPrice: null,
     rating: 4.4,
@@ -167,7 +167,7 @@ export const menuData = [
     name: "Poori",
     type: "Bread",
     image:
-      "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1619221881174-3f89e7b3ad5e?w=400&h=300&fit=crop&crop=center",
     price: 60,
     originalPrice: null,
     rating: 4.1,
@@ -198,7 +198,7 @@ export const menuData = [
     name: "Jeera Rice",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&h=300&fit=crop&crop=center",
     price: 140,
     originalPrice: null,
     rating: 4.2,
@@ -304,7 +304,7 @@ export const menuData = [
     name: "Gulab Jamun",
     type: "Dessert",
     image:
-      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1606395123027-c7f8c9dd1b1c?w=400&h=300&fit=crop&crop=center",
     price: 70,
     originalPrice: null,
     rating: 4.6,
@@ -335,7 +335,7 @@ export const menuData = [
     name: "Rasmalai",
     type: "Dessert",
     image:
-      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1631729371254-42c2892f0e4e?w=400&h=300&fit=crop&crop=center",
     price: 90,
     originalPrice: null,
     rating: 4.7,
@@ -366,7 +366,7 @@ export const menuData = [
     name: "Sandesh",
     type: "Dessert",
     image:
-      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1619221881174-3f89e7b3ad5e?w=400&h=300&fit=crop&crop=center",
     price: 60,
     originalPrice: null,
     rating: 4.4,
@@ -428,7 +428,7 @@ export const menuData = [
     name: "Chhena Poda",
     type: "Dessert",
     image:
-      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?w=400&h=300&fit=crop&crop=center",
     price: 80,
     originalPrice: null,
     rating: 4.5,
@@ -536,7 +536,7 @@ export const menuData = [
     name: "Khechudi",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&h=300&fit=crop&crop=center",
     price: 130,
     originalPrice: null,
     rating: 4.1,
@@ -643,7 +643,7 @@ export const menuData = [
     name: "Pulihora",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=300&fit=crop&crop=center",
     price: 140,
     originalPrice: null,
     rating: 4.2,
@@ -711,7 +711,7 @@ export const menuData = [
     name: "Bobbatlu",
     type: "Dessert",
     image:
-      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=400&h=300&fit=crop&crop=center",
     price: 80,
     originalPrice: null,
     rating: 4.6,
@@ -792,8 +792,6 @@ export const menuData = [
     allergens: ["None"],
     portion: "1 serving",
     chef: "Chef Carlos",
-    description: "Coconut-based prawn curry with kokum and spices",
-    isAvailable: true,
     nutritionalInfo: {
       protein: "30g",
       carbs: "15g",
@@ -843,16 +841,24 @@ export const menuData = [
     rating: 4.6,
     reviewCount: 198,
     description: "Coconut-based prawn curry with kokum and spices",
-    category: "Kerala Special",
-    tags: ["Traditional", "Healthy", "Breakfast Special"],
-    allergens: ["None"],
+    ingredients: ["Prawns", "Coconut milk", "Kokum", "Onions", "Spices"],
+    dietary: ["Non-vegetarian", "Gluten-free"],
+    spiceLevel: "Medium",
+    preparationTime: "30-35 mins",
+    calories: 320,
+    isAvailable: true,
+    isRecommended: true,
+    isPopular: true,
+    category: "Goan",
+    tags: ["Seafood", "Coconut curry", "Coastal"],
+    allergens: ["Shellfish"],
     portion: "1 serving",
-    chef: "Chef Radhika",
+    chef: "Chef Carlos",
     nutritionalInfo: {
-      protein: "12g",
-      carbs: "45g",
-      fat: "8g",
-      fiber: "6g",
+      protein: "28g",
+      carbs: "12g",
+      fat: "16g",
+      fiber: "3g",
     },
   },
   {
@@ -1315,7 +1321,7 @@ export const menuData = [
     name: "Curd Rice",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=300&fit=crop&crop=center",
     price: 90,
     originalPrice: null,
     rating: 4.1,
@@ -1346,7 +1352,7 @@ export const menuData = [
     name: "Lemon Rice",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?w=400&h=300&fit=crop&crop=center",
     price: 110,
     originalPrice: null,
     rating: 4.2,
@@ -1377,7 +1383,7 @@ export const menuData = [
     name: "Coconut Rice",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center",
     price: 120,
     originalPrice: null,
     rating: 4.3,
@@ -1414,7 +1420,7 @@ export const menuData = [
     name: "Tamarind Rice",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&fit=crop&crop=center",
     price: 130,
     originalPrice: null,
     rating: 4.0,
@@ -1445,7 +1451,7 @@ export const menuData = [
     name: "Bisi Bele Bath",
     type: "Main",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1585321308069-e5d8d8c10f66?w=400&h=300&fit=crop&crop=center",
     price: 160,
     originalPrice: null,
     rating: 4.4,
@@ -2121,7 +2127,7 @@ export const menuData = [
     name: "Pongal",
     type: "Breakfast",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400&h=300&fit=crop&crop=center",
     price: 110,
     originalPrice: null,
     rating: 4.0,
@@ -2152,7 +2158,7 @@ export const menuData = [
     name: "Upma",
     type: "Breakfast",
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=300&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=300&fit=crop&crop=center",
     price: 90,
     originalPrice: null,
     rating: 4.1,
@@ -2384,15 +2390,15 @@ export const menuData = [
     isRecommended: false,
     isPopular: false,
     category: "Gujarati",
-    tags: ["Winter special", "Mixed vegetables", "Festive"],
-    allergens: ["None"],
-    portion: "1 serving",
+    tags: ["Flatbread", "Fenugreek", "Travel food"],
+    allergens: ["Gluten", "Dairy"],
+    portion: "3 pieces",
     chef: "Chef Priya",
     nutritionalInfo: {
-      protein: "8g",
-      carbs: "45g",
+      protein: "6g",
+      carbs: "38g",
       fat: "8g",
-      fiber: "12g",
+      fiber: "4g",
     },
   },
 ];
