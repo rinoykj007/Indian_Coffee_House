@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Asterisk, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import header from "../../assets/header.png";
 
 export default function Header({ headerRef, aboutRef, navItems }) {
   // Navigation state
@@ -35,7 +36,7 @@ export default function Header({ headerRef, aboutRef, navItems }) {
   return (
     <header
       ref={headerRef}
-      className="relative h-screen bg-cover bg-center flex flex-col justify-between"
+      className="relative h-screen bg-cover bg-center flex flex-col justify-center pt-8"
       style={{
         backgroundImage:
           'url("https://res.cloudinary.com/abdel-rahman-ali/image/upload/v1535988534/header.jpg")',
@@ -81,7 +82,7 @@ export default function Header({ headerRef, aboutRef, navItems }) {
                     ? "text-black hover:text-amber-600 hover:bg-amber-100"
                     : "text-white hover:text-amber-400 hover:bg-amber-900/30"
                 } border border-amber-500/30`}
-                onClick={() => navigate('/management')}
+                onClick={() => navigate("/management")}
                 title="Staff & Admin Access"
               >
                 <Settings className="w-4 h-4" />
@@ -145,7 +146,7 @@ export default function Header({ headerRef, aboutRef, navItems }) {
               <button
                 className="flex items-center gap-2 text-lg font-semibold tracking-wide text-amber-100 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-amber-700/30 hover:text-amber-300 border border-amber-500/30"
                 onClick={() => {
-                  navigate('/management');
+                  navigate("/management");
                   setNavShow(false);
                 }}
               >
@@ -156,25 +157,68 @@ export default function Header({ headerRef, aboutRef, navItems }) {
           </ul>
         </div>
       </nav>
-      <div className="flex flex-col items-center justify-center text-center mt-28 md:mt-40 relative">
-        <h2 className="text-[80px] md:text-[100px] font-normal italic text-yellow-400 font-[Herr Von Muellerhoff,cursive] mb-2 md:mb-4 drop-shadow-lg">
-          Welcome
-        </h2>
-        <h1 className="text-[40px] md:text-[60px] font-extrabold tracking-[9.4px] text-white font-sans mb-4 drop-shadow-lg">
-          The Indian Coffee House
-        </h1>
-        <div className="flex items-center justify-center gap-2 my-4">
-          <span className="block w-10 h-1 bg-yellow-500 rounded"></span>
-          <Asterisk className="text-yellow-500 w-6 h-6 mx-2 drop-shadow-lg" />
-          <span className="block w-10 h-1 bg-yellow-500 rounded"></span>
-        </div>
-        <span className="text-yellow-100 text-lg mb-4 drop-shadow">
-          Ready To Be Opened
-        </span>
-        <div className="mt-4">
-          <button className="px-8 py-3 bg-yellow-500 text-white font-semibold rounded-full shadow-xl hover:bg-yellow-600 transition-all duration-200 text-lg tracking-wide">
-            Explore
+      <div className="flex flex-col lg:flex-row items-center justify-between relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-8 lg:py-20 gap-8 sm:gap-12 lg:gap-32">
+        <div className="flex flex-col items-center lg:items-start justify-center lg:w-1/2 z-10 lg:pr-12 w-full">
+          <h1 className="text-[32px] sm:text-[40px] lg:text-[52px] font-bold text-white mb-2 sm:mb-3 leading-tight text-center lg:text-left">
+            Enjoy the best
+            <br />
+            <span className="text-yellow-400">food</span> with
+            <br />
+            us... 🍔
+          </h1>
+          <p className="text-yellow-100 text-sm sm:text-base mb-4 sm:mb-6 max-w-md leading-relaxed text-center lg:text-left">
+            Experience authentic Indian flavors crafted with love and tradition.
+            From aromatic coffee to delicious meals, we bring you the taste of
+            India.
+          </p>
+          <button className="bg-yellow-500 text-white px-6 py-3 rounded-xl font-semibold text-base hover:bg-yellow-600 transition-all duration-200 shadow-lg hover:shadow-xl mb-4 sm:mb-0">
+            Order Now →
           </button>
+
+          <div className="flex items-center gap-3 mt-4 sm:mt-6">
+            <div className="flex -space-x-2">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-yellow-300 border-2 border-white"></div>
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-yellow-400 border-2 border-white"></div>
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-yellow-500 border-2 border-white"></div>
+            </div>
+            <div className="text-xs">
+              <div className="flex items-center gap-1">
+                <span className="text-yellow-400">★</span>
+                <span className="font-semibold text-white">4.7</span>
+                <span className="text-yellow-100">(323 reviews)</span>
+              </div>
+              <div className="text-yellow-100">300+ happy customers</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:w-1/2 flex justify-center lg:justify-end relative w-full">
+          <div className="relative max-w-xs sm:max-w-sm lg:max-w-none">
+            <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-yellow-400/20 rounded-full w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96"></div>
+            <img
+              src={header}
+              alt="Indian Coffee House Chef"
+              className="relative z-10 w-40 sm:w-56 lg:w-80 h-auto object-contain rounded-2xl"
+            />
+
+            {/* Floating elements - hidden on mobile */}
+            <div className="hidden sm:block absolute top-4 lg:top-8 -left-4 lg:-left-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 lg:p-3 text-xs lg:text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-500">🚀</span>
+                <span className="font-semibold">Fastest Delivery</span>
+              </div>
+            </div>
+
+            <div className="hidden sm:block absolute bottom-4 lg:bottom-8 -right-4 lg:-right-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 lg:p-3 text-xs lg:text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-yellow-500 rounded"></div>
+                <div>
+                  <div className="font-semibold">Best Coffee</div>
+                  <div className="text-gray-600">₹45</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>
