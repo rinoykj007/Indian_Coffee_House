@@ -174,7 +174,10 @@ export default function Header({ headerRef, aboutRef, navItems }) {
             From aromatic coffee to delicious meals, we bring you the taste of
             India.
           </p>
-          <button className="bg-yellow-500 text-white px-6 py-3 rounded-xl font-semibold text-base hover:bg-yellow-600 transition-all duration-200 shadow-lg hover:shadow-xl mb-4 sm:mb-0">
+          <button
+            className="bg-yellow-500 text-white px-6 py-3 rounded-xl font-semibold text-base hover:bg-yellow-600 transition-all duration-200 shadow-lg hover:shadow-xl mb-4 sm:mb-0"
+            onClick={() => navigate("/MenuList")}
+          >
             Order Now →
           </button>
 

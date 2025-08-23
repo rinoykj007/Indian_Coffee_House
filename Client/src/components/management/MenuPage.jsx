@@ -255,7 +255,7 @@ const MenuPage = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-amber-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4 space-y-4 md:space-y-0">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate("/management/staff")}
@@ -280,23 +280,21 @@ const MenuPage = () => {
                 </div>
               </div>
             </div>
-
+            {/* Show summary and button only on md and up, all info inside button */}
             {orderItems.length > 0 && (
-              <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-slate-800">
-                    {orderItems.length} items
-                  </p>
-                  <p className="text-lg font-bold text-amber-600">
-                    ₹{orderTotal}
-                  </p>
-                </div>
+              <div className="hidden md:flex items-center justify-end text-right">
                 <button
                   onClick={submitOrder}
-                  className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-4 text-lg"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <span>Submit Order</span>
+                  <span className="text-sm font-semibold bg-white text-green-700 rounded px-2 py-1 ml-2">
+                    {orderItems.length} items
+                  </span>
+                  <span className="text-base font-bold ml-2 text-amber-300">
+                    ₹{orderTotal}
+                  </span>
                 </button>
               </div>
             )}
@@ -366,18 +364,13 @@ const MenuPage = () => {
                   )}
 
                   <div className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-slate-800 mb-1">
-                          {item.name}
-                        </h3>
-                        <p className="text-sm text-slate-600 mb-2">
-                          {item.description}
-                        </p>
-                        <p className="text-lg font-bold text-amber-600">
-                          ₹{item.price}
-                        </p>
-                      </div>
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="font-semibold text-slate-800">
+                        {item.name}
+                      </h3>
+                      <p className="text-lg font-bold text-amber-600 ml-4">
+                        ₹{item.price}
+                      </p>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -430,6 +423,20 @@ const MenuPage = () => {
           </div>
         )}
       </main>
+
+      {/* Floating Submit Order Button - only on mobile */}
+      {orderItems.length > 0 && (
+        <div className="md:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-xs px-4">
+          <button
+            onClick={submitOrder}
+            className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg flex items-center justify-center space-x-2 text-lg transition-colors"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <span>Submit Order</span>
+            <span className="ml-2 text-base font-bold">₹{orderTotal}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

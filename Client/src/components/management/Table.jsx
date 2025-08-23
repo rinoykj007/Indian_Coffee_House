@@ -24,47 +24,64 @@ const Table = () => {
 
   const fetchPendingBills = async () => {
     try {
-      console.log('=== FETCHING PENDING BILLS ===');
-      console.log('All tables:', tables);
-      
+      console.log("=== FETCHING PENDING BILLS ===");
+      console.log("All tables:", tables);
+
       // Get all occupied tables and their bills
-      const occupiedTables = tables.filter(table => table.status === 'occupied');
-      console.log('Occupied tables:', occupiedTables);
-      
+      const occupiedTables = tables.filter(
+        (table) => table.status === "occupied"
+      );
+      console.log("Occupied tables:", occupiedTables);
+
       const bills = [];
-      
+
       for (const table of occupiedTables) {
         try {
           const tableId = table._id || table.id;
-          console.log(`Fetching bill for table ${table.tableNumber}, ID: ${tableId}`);
-          
-          const response = await makeAuthenticatedRequest(`/payments/table/${tableId}/bill`);
-          console.log(`Response for table ${table.tableNumber}:`, response.status);
-          
+          console.log(
+            `Fetching bill for table ${table.tableNumber}, ID: ${tableId}`
+          );
+
+          const response = await makeAuthenticatedRequest(
+            `/payments/table/${tableId}/bill`
+          );
+          console.log(
+            `Response for table ${table.tableNumber}:`,
+            response.status
+          );
+
           if (response.ok) {
             const data = await response.json();
             console.log(`Bill data for table ${table.tableNumber}:`, data);
-            
+
             if (data.success && data.bill) {
               bills.push(data.bill);
             }
           } else if (response.status === 404) {
             // Table is occupied but no pending order (likely already paid)
             // This is normal - just skip this table
-            console.log(`Table ${table.tableNumber} is occupied but has no pending orders (likely already paid)`);
+            console.log(
+              `Table ${table.tableNumber} is occupied but has no pending orders (likely already paid)`
+            );
           } else {
             const errorData = await response.json();
-            console.error(`Error response for table ${table.tableNumber}:`, errorData);
+            console.error(
+              `Error response for table ${table.tableNumber}:`,
+              errorData
+            );
           }
         } catch (error) {
-          console.error(`Error fetching bill for table ${table.tableNumber}:`, error);
+          console.error(
+            `Error fetching bill for table ${table.tableNumber}:`,
+            error
+          );
         }
       }
-      
-      console.log('Final bills array:', bills);
+
+      console.log("Final bills array:", bills);
       setPendingBills(bills);
     } catch (error) {
-      console.error('Error fetching pending bills:', error);
+      console.error("Error fetching pending bills:", error);
     }
   };
 
@@ -109,7 +126,7 @@ const Table = () => {
       const action = window.confirm(
         `Table ${table.tableNumber} is occupied. Click OK to add more items to their order, or Cancel to mark table as available (customers finished).`
       );
-      
+
       if (action) {
         // Staff wants to add more items - navigate to menu
         navigate("/management/menu", {
@@ -136,7 +153,6 @@ const Table = () => {
     });
   };
 
-
   const processPayment = async (bill) => {
     // Prevent multiple payments at once
     if (processingBillId) {
@@ -145,25 +161,27 @@ const Table = () => {
 
     setProcessingBillId(bill.tableId);
     try {
-      const response = await makeAuthenticatedRequest('/payments/process', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await makeAuthenticatedRequest("/payments/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: bill.orderId,
           tableId: bill.tableId,
-          paymentMethod: 'cash',
+          paymentMethod: "cash",
           discount: 0,
-          staffId: user?._id
-        })
+          staffId: user?._id,
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
-        
+
         // Immediately remove the processed bill from UI for instant feedback
-        setPendingBills(prevBills => prevBills.filter(b => b.tableId !== bill.tableId));
-        
+        setPendingBills((prevBills) =>
+          prevBills.filter((b) => b.tableId !== bill.tableId)
+        );
+
         // Refresh tables and bills with a small delay to ensure backend is updated
         setTimeout(async () => {
           await fetchTables();
@@ -174,8 +192,8 @@ const Table = () => {
         alert(`Payment failed: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error processing payment:', error);
-      alert('Error processing payment. Please try again.');
+      console.error("Error processing payment:", error);
+      alert("Error processing payment. Please try again.");
     } finally {
       setProcessingBillId(null);
     }
@@ -231,11 +249,15 @@ const Table = () => {
             <div className="flex space-x-6">
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                <span className="text-slate-600">Available - Click to take order</span>
+                <span className="text-slate-600">
+                  Available - Click to take order
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                <span className="text-slate-600">Occupied - Click for options</span>
+                <span className="text-slate-600">
+                  Occupied - Click for options
+                </span>
               </div>
             </div>
           </div>
@@ -259,7 +281,11 @@ const Table = () => {
                   <div
                     className={`
                     w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center
-                    ${table.status === "available" ? "bg-green-100" : "bg-red-100"}
+                    ${
+                      table.status === "available"
+                        ? "bg-green-100"
+                        : "bg-red-100"
+                    }
                   `}
                   >
                     <Users
@@ -325,19 +351,29 @@ const Table = () => {
 
                     {/* Item Details */}
                     <div className="bg-white rounded-lg p-3 mb-3">
-                      <h5 className="text-sm font-medium text-slate-700 mb-2">Order Items:</h5>
+                      <h5 className="text-sm font-medium text-slate-700 mb-2">
+                        Order Items:
+                      </h5>
                       <div className="space-y-2">
-                        {bill.items && bill.items.map((item, index) => (
-                          <div key={index} className="flex justify-between items-center text-sm">
-                            <div className="flex-1">
-                              <span className="font-medium text-slate-700">{item.name}</span>
-                              <span className="text-slate-500 ml-2">× {item.quantity}</span>
+                        {bill.items &&
+                          bill.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center text-sm"
+                            >
+                              <div className="flex-1">
+                                <span className="font-medium text-slate-700">
+                                  {item.name}
+                                </span>
+                                <span className="text-slate-500 ml-2">
+                                  × {item.quantity}
+                                </span>
+                              </div>
+                              <div className="text-slate-800 font-medium">
+                                ₹{(item.price * item.quantity).toFixed(0)}
+                              </div>
                             </div>
-                            <div className="text-slate-800 font-medium">
-                              ₹{(item.price * item.quantity).toFixed(0)}
-                            </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
 
@@ -346,7 +382,9 @@ const Table = () => {
                       <div className="space-y-1">
                         <div className="flex justify-between text-sm">
                           <span className="text-slate-600">Subtotal:</span>
-                          <span className="text-slate-800">₹{bill.subtotal}</span>
+                          <span className="text-slate-800">
+                            ₹{bill.subtotal}
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-slate-600">Tax (18%):</span>
@@ -354,18 +392,38 @@ const Table = () => {
                         </div>
                         <div className="flex justify-between font-semibold text-base border-t border-slate-200 pt-2 mt-2">
                           <span className="text-slate-800">Total Amount:</span>
-                          <span className="text-amber-600">₹{bill.totalAmount}</span>
+                          <span className="text-amber-600">
+                            ₹{bill.totalAmount}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Quick Payment Button */}
+                    {/* Add More Items Button */}
+                    <button
+                      onClick={() =>
+                        navigate("/management/menu", {
+                          state: {
+                            table: { tableNumber: bill.tableNumber },
+                            tableId: bill.tableId,
+                            isAdditionalOrder: true,
+                          },
+                        })
+                      }
+                      className="w-full mt-3 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                    >
+                      Add More Items
+                    </button>
+                    {/* Quick Payment Button */}
                     <button
                       onClick={() => processPayment(bill)}
                       disabled={processingBillId !== null}
-                      className="w-full mt-3 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                      className="w-full mt-2 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
                     >
-                      {processingBillId === bill.tableId ? 'Processing...' : 'Process Payment (Cash)'}
+                      {processingBillId === bill.tableId
+                        ? "Processing..."
+                        : "Process Payment (Cash)"}
                     </button>
                   </div>
                 ))
@@ -376,7 +434,6 @@ const Table = () => {
               )}
             </div>
           </div>
-
         </div>
       </div>
     </div>
