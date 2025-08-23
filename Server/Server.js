@@ -18,6 +18,7 @@ const allowedOrigins = [
   "https://indian-coffee-house-v5l9jy13d-rinoykj007s-projects.vercel.app",
   "https://indian-coffee-house-hxyp.vercel.app",
   "http://localhost:5173",
+  "http://localhost:5174",
   "https://indian-coffee-house-i6c5.vercel.app",
 ];
 
