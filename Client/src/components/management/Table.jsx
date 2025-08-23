@@ -9,11 +9,7 @@ const Table = () => {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pendingBills, setPendingBills] = useState([]);
-  const [selectedTableForPayment, setSelectedTableForPayment] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('cash');
-  const [discount, setDiscount] = useState(0);
-  const [paymentLoading, setPaymentLoading] = useState(false);
-  const [selectedBillDetails, setSelectedBillDetails] = useState(null);
+  const [processingBillId, setProcessingBillId] = useState(null);
 
   useEffect(() => {
     fetchTables();
@@ -140,36 +136,23 @@ const Table = () => {
     });
   };
 
-  const handleTableSelection = (tableId) => {
-    setSelectedTableForPayment(tableId);
-    
-    // Find and set the selected bill details
-    const selectedBill = pendingBills.find(bill => bill.tableId === tableId);
-    setSelectedBillDetails(selectedBill);
-  };
 
-  const processPayment = async () => {
-    if (!selectedTableForPayment) {
-      alert('Please select a table for payment');
+  const processPayment = async (bill) => {
+    // Prevent multiple payments at once
+    if (processingBillId) {
       return;
     }
 
-    const selectedBill = pendingBills.find(bill => bill.tableId === selectedTableForPayment);
-    if (!selectedBill) {
-      alert('No pending bill found for selected table');
-      return;
-    }
-
-    setPaymentLoading(true);
+    setProcessingBillId(bill.tableId);
     try {
       const response = await makeAuthenticatedRequest('/payments/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderId: selectedBill.orderId,
-          tableId: selectedBill.tableId,
-          paymentMethod: paymentMethod,
-          discount: discount,
+          orderId: bill.orderId,
+          tableId: bill.tableId,
+          paymentMethod: 'cash',
+          discount: 0,
           staffId: user?._id
         })
       });
@@ -178,15 +161,14 @@ const Table = () => {
         const data = await response.json();
         alert(data.message);
         
-        // Refresh tables and bills
-        await fetchTables();
-        await fetchPendingBills();
+        // Immediately remove the processed bill from UI for instant feedback
+        setPendingBills(prevBills => prevBills.filter(b => b.tableId !== bill.tableId));
         
-        // Reset form
-        setSelectedTableForPayment('');
-        setSelectedBillDetails(null);
-        setPaymentMethod('cash');
-        setDiscount(0);
+        // Refresh tables and bills with a small delay to ensure backend is updated
+        setTimeout(async () => {
+          await fetchTables();
+          await fetchPendingBills();
+        }, 500);
       } else {
         const errorData = await response.json();
         alert(`Payment failed: ${errorData.error}`);
@@ -195,7 +177,7 @@ const Table = () => {
       console.error('Error processing payment:', error);
       alert('Error processing payment. Please try again.');
     } finally {
-      setPaymentLoading(false);
+      setProcessingBillId(null);
     }
   };
 
@@ -317,26 +299,74 @@ const Table = () => {
             <h3 className="text-lg font-semibold text-slate-800 mb-4">
               Pending Bills
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {pendingBills.length > 0 ? (
                 pendingBills.map((bill) => (
                   <div
                     key={bill.tableId}
-                    className="flex justify-between items-center p-3 bg-amber-50 rounded-lg border border-amber-200"
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
                   >
-                    <div>
-                      <p className="font-semibold text-slate-800">
-                        Table {bill.tableNumber}
-                      </p>
-                      <p className="text-sm text-slate-600">
-                        {bill.itemsCount} items • Order #{bill.orderNumber}
-                      </p>
+                    {/* Bill Header */}
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <h4 className="font-semibold text-slate-800 text-lg">
+                          Table {bill.tableNumber}
+                        </h4>
+                        <p className="text-sm text-slate-600">
+                          Order #{bill.orderNumber} • {bill.itemsCount} items
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-amber-600 text-lg">
+                          ₹{bill.totalAmount}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-amber-600">
-                        ₹{bill.totalAmount}
-                      </p>
+
+                    {/* Item Details */}
+                    <div className="bg-white rounded-lg p-3 mb-3">
+                      <h5 className="text-sm font-medium text-slate-700 mb-2">Order Items:</h5>
+                      <div className="space-y-2">
+                        {bill.items && bill.items.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center text-sm">
+                            <div className="flex-1">
+                              <span className="font-medium text-slate-700">{item.name}</span>
+                              <span className="text-slate-500 ml-2">× {item.quantity}</span>
+                            </div>
+                            <div className="text-slate-800 font-medium">
+                              ₹{(item.price * item.quantity).toFixed(0)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+
+                    {/* Bill Breakdown */}
+                    <div className="bg-white rounded-lg p-3 border-t border-amber-200">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Subtotal:</span>
+                          <span className="text-slate-800">₹{bill.subtotal}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Tax (18%):</span>
+                          <span className="text-slate-800">₹{bill.tax}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold text-base border-t border-slate-200 pt-2 mt-2">
+                          <span className="text-slate-800">Total Amount:</span>
+                          <span className="text-amber-600">₹{bill.totalAmount}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Payment Button */}
+                    <button
+                      onClick={() => processPayment(bill)}
+                      disabled={processingBillId !== null}
+                      className="w-full mt-3 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                    >
+                      {processingBillId === bill.tableId ? 'Processing...' : 'Process Payment (Cash)'}
+                    </button>
                   </div>
                 ))
               ) : (
@@ -347,112 +377,6 @@ const Table = () => {
             </div>
           </div>
 
-          {/* Payment Form */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">
-              Process Payment
-            </h3>
-            
-            <div className="space-y-4">
-              {/* Table Selection */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Select Table
-                </label>
-                <select
-                  value={selectedTableForPayment}
-                  onChange={(e) => handleTableSelection(e.target.value)}
-                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                >
-                  <option value="">Choose a table...</option>
-                  {pendingBills.map((bill) => (
-                    <option key={bill.tableId} value={bill.tableId}>
-                      Table {bill.tableNumber} • {bill.itemsCount} items • Order #{bill.orderNumber} • ₹{bill.totalAmount}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Payment Method */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Payment Method
-                </label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                >
-                  <option value="cash">Cash</option>
-                  <option value="card">Card</option>
-                  <option value="upi">UPI</option>
-                  <option value="online">Online</option>
-                </select>
-              </div>
-
-              {/* Discount */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Discount (₹)
-                </label>
-                <input
-                  type="number"
-                  value={discount}
-                  onChange={(e) => setDiscount(Number(e.target.value))}
-                  min="0"
-                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                  placeholder="0"
-                />
-              </div>
-
-              {/* Selected Bill Details */}
-              {selectedBillDetails && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-slate-800 mb-3">
-                    Bill Details - Table {selectedBillDetails.tableNumber}
-                  </h4>
-                  
-                  <div className="space-y-2 mb-4">
-                    {selectedBillDetails.items && selectedBillDetails.items.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center text-sm">
-                        <div className="flex-1">
-                          <span className="font-medium text-slate-700">{item.name}</span>
-                          <span className="text-slate-500 ml-2">× {item.quantity}</span>
-                        </div>
-                        <div className="text-slate-800 font-medium">
-                          ₹{(item.price * item.quantity).toFixed(0)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="border-t border-amber-300 pt-3 space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Subtotal:</span>
-                      <span className="text-slate-800">₹{selectedBillDetails.subtotal}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Tax (18%):</span>
-                      <span className="text-slate-800">₹{selectedBillDetails.tax}</span>
-                    </div>
-                    <div className="flex justify-between font-semibold text-lg border-t border-amber-300 pt-2">
-                      <span className="text-slate-800">Total:</span>
-                      <span className="text-amber-600">₹{selectedBillDetails.totalAmount}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Process Payment Button */}
-              <button
-                onClick={processPayment}
-                disabled={paymentLoading || !selectedTableForPayment}
-                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-slate-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-              >
-                {paymentLoading ? 'Processing...' : 'Process Payment'}
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

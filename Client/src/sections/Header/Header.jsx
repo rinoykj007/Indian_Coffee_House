@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Asterisk, Settings } from "lucide-react";
+import { Asterisk, Settings, Coffee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import header from "../../assets/header.png";
 
@@ -43,8 +43,11 @@ export default function Header({ headerRef, aboutRef, navItems }) {
       }}
     >
       {/* Overlay removed for brighter background image */}
-      <nav aria-label="Main Navigation" style={{ zIndex: 10 }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-8 ">
+      <nav
+        aria-label="Main Navigation"
+        className="absolute top-0 left-0 right-0 z-[101]"
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-end px-8 py-6 pt-0">
           {/* Desktop Nav */}
           <ul className="hidden md:flex gap-4 items-center bg-white/10 rounded-xl px-4 py-2 shadow-lg">
             {navItems.map((item, idx) => (
@@ -92,9 +95,9 @@ export default function Header({ headerRef, aboutRef, navItems }) {
           </ul>
           {/* Mobile Toggle */}
           <button
-            aria-label="Toggle navigation menu z-10"
+            aria-label="Toggle navigation menu"
             aria-expanded={navShow}
-            className="md:hidden flex flex-col justify-center items-center w-10 h-10 cursor-pointer ml-auto"
+            className="md:hidden flex flex-col justify-center items-center w-10 h-10 cursor-pointer ml-auto z-[100] relative"
             onClick={() => setNavShow((s) => !s)}
           >
             <span
@@ -116,7 +119,7 @@ export default function Header({ headerRef, aboutRef, navItems }) {
         </div>
         {/* Mobile Nav */}
         <div
-          className={`md:hidden fixed top-0 left-0 w-full h-screen bg-black bg-opacity-90  flex flex-col items-center pt-24 ${
+          className={`md:hidden fixed top-0 left-0 w-full h-screen bg-black bg-opacity-90 flex flex-col items-center pt-24 z-[99] ${
             navShow ? "block" : "hidden"
           }`}
         >
@@ -209,12 +212,11 @@ export default function Header({ headerRef, aboutRef, navItems }) {
               </div>
             </div>
 
-            <div className="hidden sm:block absolute bottom-4 lg:bottom-8 -right-4 lg:-right-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 lg:p-3 text-xs lg:text-sm">
+            <div className="hidden sm:block absolute bottom-4 lg:bottom-8 -right-4 lg:-right-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 lg:p-3 text-xs lg:text-sm z-20">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-yellow-500 rounded"></div>
+                <Coffee className="w-6 h-6 lg:w-8 lg:h-8 text-yellow-500" />
                 <div>
                   <div className="font-semibold">Best Coffee</div>
-                  <div className="text-gray-600">₹45</div>
                 </div>
               </div>
             </div>

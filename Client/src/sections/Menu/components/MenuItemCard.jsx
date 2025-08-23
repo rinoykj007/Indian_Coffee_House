@@ -36,6 +36,13 @@ const MenuItemCard = ({ item, index, addToCart }) => {
           </span>
         </div>
 
+        {/* Description */}
+        {item.description && (
+          <p className="text-sm text-gray-600 leading-relaxed">
+            {item.description}
+          </p>
+        )}
+
         {/* Price & Rating */}
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold text-green-600">

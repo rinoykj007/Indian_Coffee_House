@@ -25,6 +25,8 @@ export default function Meanulist() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cart, setCart] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20); // Show 20 items per page
 
   const addToCart = (item) => {
     setCart((prev) =>
@@ -48,8 +50,15 @@ export default function Meanulist() {
   };
 
   useEffect(() => {
+    console.log(
+      "Fetching menu from:",
+      `${import.meta.env.VITE_API_URL}/api/menu`
+    );
+
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/menu`)
+      .get(`${import.meta.env.VITE_API_URL}/api/menu`, {
+        timeout: 30000, // 30 second timeout
+      })
       .then((res) => {
         console.log("Menu data from backend:", res.data);
         let menuData = res.data.menuItems || res.data;
@@ -60,7 +69,22 @@ export default function Meanulist() {
         setLoading(false);
       })
       .catch((err) => {
-        setError("Failed to fetch menu");
+        console.error("Menu fetch error:", err);
+        if (err.code === "ECONNABORTED") {
+          setError(
+            "Menu loading timeout - server might be starting up, please wait and try again"
+          );
+        } else if (err.response) {
+          setError(
+            `Server error: ${err.response.status} - ${err.response.statusText}`
+          );
+        } else if (err.request) {
+          setError(
+            "Cannot connect to server - please check your connection or try again later"
+          );
+        } else {
+          setError(`Failed to fetch menu: ${err.message}`);
+        }
         setLoading(false);
       });
   }, []);

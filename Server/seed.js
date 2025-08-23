@@ -1,7 +1,7 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const Menu = require("./Menu");
-const { menuData } = require("./seeddata");
+const Menu = require("./models/Menu");
+const { menuData } = require("./menulist.js");
 
 mongoose
   .connect(process.env.MONGO_URI, {
