@@ -20,6 +20,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://indian-coffee-house-i6c5.vercel.app",
+  "https://www.payasam.ie",
 ];
 
 app.use(
