@@ -108,10 +108,3 @@ app.listen(PORT, () => {
     `📊 API Documentation available at https://indian-coffee-house.vercel.app/health`
   );
 });
-  console.log(
-    `🚀 Indian Coffee House Management Server running on port ${PORT}`
-  );
-  console.log(
-    `📊 API Documentation available at https://indian-coffee-house.vercel.app/health`
-  );
-});
