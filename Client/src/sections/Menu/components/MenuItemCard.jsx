@@ -11,10 +11,10 @@ const MenuItemCard = ({ item, index, addToCart }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-200 max-w-sm w-full">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-200 max-w-sm w-full flex flex-col h-[420px]">
       {/* Dish Image */}
       {item.image && (
-        <div className="h-48 overflow-hidden">
+        <div className="h-40 w-full overflow-hidden flex-shrink-0">
           <img
             src={item.image}
             alt={item.name}
@@ -25,26 +25,28 @@ const MenuItemCard = ({ item, index, addToCart }) => {
       )}
 
       {/* Card Content */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 flex flex-col flex-1 justify-between">
         {/* Dish Name & Type */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-gray-800">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">
             {item.name}
           </h3>
-          <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded">
+          <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded mb-2">
             {item.type}
           </span>
         </div>
 
         {/* Description */}
-        {item.description && (
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {item.description}
-          </p>
-        )}
+        <div className="mb-2 flex-1">
+          {item.description && (
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {item.description}
+            </p>
+          )}
+        </div>
 
         {/* Price & Rating */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           <span className="text-lg font-bold text-green-600">
             ${item.price || Math.floor(Math.random() * 15) + 8}
           </span>
@@ -79,8 +81,6 @@ const MenuItemCard = ({ item, index, addToCart }) => {
           )}
         </button>
       </div>
-
-
     </div>
   );
 };
