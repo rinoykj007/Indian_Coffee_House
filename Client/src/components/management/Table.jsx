@@ -380,17 +380,7 @@ const Table = () => {
                     {/* Bill Breakdown */}
                     <div className="bg-white rounded-lg p-3 border-t border-amber-200">
                       <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-600">Subtotal:</span>
-                          <span className="text-slate-800">
-                            ₹{bill.subtotal}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-600">Tax (18%):</span>
-                          <span className="text-slate-800">₹{bill.tax}</span>
-                        </div>
-                        <div className="flex justify-between font-semibold text-base border-t border-slate-200 pt-2 mt-2">
+                        <div className="flex justify-between font-semibold text-base mt-2">
                           <span className="text-slate-800">Total Amount:</span>
                           <span className="text-amber-600">
                             ₹{bill.totalAmount}
