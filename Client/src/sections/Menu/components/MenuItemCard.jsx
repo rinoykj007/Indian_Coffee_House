@@ -85,4 +85,11 @@ const MenuItemCard = ({ item, index, addToCart }) => {
   );
 };
 
+// In parent component (not in MenuItemCard itself):
+// const pendingOrders = orders.filter(order => order.status === "pending");
+// Render MenuItemCard only for pending orders
+// pendingOrders.map(order => (
+//   <MenuItemCard key={order._id} item={order} addToCart={addToCart} />
+// ));
+
 export default MenuItemCard;

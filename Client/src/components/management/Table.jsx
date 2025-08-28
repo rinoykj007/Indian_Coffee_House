@@ -10,6 +10,7 @@ const Table = () => {
   const [loading, setLoading] = useState(true);
   const [pendingBills, setPendingBills] = useState([]);
   const [processingBillId, setProcessingBillId] = useState(null);
+  const [currentBill, setCurrentBill] = useState(null);
 
   useEffect(() => {
     fetchTables();
@@ -27,15 +28,12 @@ const Table = () => {
       console.log("=== FETCHING PENDING BILLS ===");
       console.log("All tables:", tables);
 
-      // Get all occupied tables and their bills
-      const occupiedTables = tables.filter(
-        (table) => table.status === "occupied"
-      );
-      console.log("Occupied tables:", occupiedTables);
+      // Get all tables - not just occupied ones, as table status might be out of sync with order status
+      console.log("Checking all tables for pending bills");
 
       const bills = [];
 
-      for (const table of occupiedTables) {
+      for (const table of tables) {
         try {
           const tableId = table._id || table.id;
           console.log(
@@ -55,16 +53,13 @@ const Table = () => {
             console.log(`Bill data for table ${table.tableNumber}:`, data);
 
             if (data.success && data.bill) {
+              console.log(
+                `Found bill for table ${table.tableNumber}, adding to pending bills`
+              );
               bills.push(data.bill);
             }
-          } else if (response.status === 404) {
-            // Table is occupied but no pending order (likely already paid)
-            // This is normal - just skip this table
-            console.log(
-              `Table ${table.tableNumber} is occupied but has no pending orders (likely already paid)`
-            );
-          } else {
-            const errorData = await response.json();
+          } else if (response.status !== 404) {
+            const errorData = await response.text();
             console.error(
               `Error response for table ${table.tableNumber}:`,
               errorData
@@ -80,6 +75,17 @@ const Table = () => {
 
       console.log("Final bills array:", bills);
       setPendingBills(bills);
+
+      // If we found bills for tables marked as available, update their status
+      for (const bill of bills) {
+        const table = tables.find((t) => (t._id || t.id) === bill.tableId);
+        if (table && table.status === "available") {
+          console.log(
+            `Table ${bill.tableNumber} has pending bill but status is available. Updating status to occupied.`
+          );
+          await updateTableStatus(bill.tableId, "occupied");
+        }
+      }
     } catch (error) {
       console.error("Error fetching pending bills:", error);
     }
@@ -111,16 +117,6 @@ const Table = () => {
   };
 
   const selectTable = async (table) => {
-    // Debug: Log table data before navigation
-    console.log("=== TABLE SELECTION DEBUG ===");
-    console.log("Selected table:", table);
-    console.log("Table ID (_id):", table._id);
-    console.log("Table ID (id):", table.id);
-    console.log("Table Number:", table.tableNumber);
-    console.log("Table Status:", table.status);
-    console.log("Final tableId being passed:", table._id || table.id);
-    console.log("===============================");
-
     if (table.status === "occupied") {
       // Show options for occupied table
       const action = window.confirm(
@@ -202,6 +198,31 @@ const Table = () => {
   const handleLogout = () => {
     logout();
     navigate("/management/login");
+  };
+
+  // Add this function if it doesn't exist
+  const updateTableStatus = async (tableId, status) => {
+    try {
+      const response = await makeAuthenticatedRequest(
+        `/tables/${tableId}/status`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        }
+      );
+
+      if (response.ok) {
+        // Update local state to reflect the change
+        setTables((tables) =>
+          tables.map((table) =>
+            (table._id || table.id) === tableId ? { ...table, status } : table
+          )
+        );
+      }
+    } catch (error) {
+      console.error(`Failed to update table status:`, error);
+    }
   };
 
   if (loading) {

@@ -1,0 +1,81 @@
+import React, { useState, useEffect } from "react";
+import { makeAuthenticatedRequest } from "../../utils/api"; // Adjust the import based on your project structure
+
+const TableBill = ({ tableId, setShowBillModal }) => {
+  const [currentBill, setCurrentBill] = useState(null);
+
+  useEffect(() => {
+    if (tableId) {
+      fetchTableBill(tableId);
+    }
+  }, [tableId]);
+
+  // When fetching orders/bills, filter for pending status:
+  const fetchTableBill = async (tableId) => {
+    try {
+      const response = await makeAuthenticatedRequest(
+        `/payments/table/${tableId}/bill`
+      );
+      const data = await response.json();
+
+      // Check if this order is actually pending
+      if (
+        data.success &&
+        data.bill &&
+        (await verifyOrderIsPending(data.bill.orderId))
+      ) {
+        // Only set bill data if the order is still pending
+        setCurrentBill(data.bill);
+      } else {
+        setCurrentBill(null); // No pending bill
+      }
+    } catch (error) {
+      console.error("Error fetching bill:", error);
+      setCurrentBill(null);
+    }
+  };
+
+  // Add this helper function to double-check order status:
+  const verifyOrderIsPending = async (orderId) => {
+    try {
+      const response = await makeAuthenticatedRequest(`/orders/${orderId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.order && data.order.status === "pending";
+      }
+      return false;
+    } catch (error) {
+      console.error("Error verifying order status:", error);
+      return false;
+    }
+  };
+
+  // After payment is processed, refresh bills:
+  const handlePaymentProcessed = () => {
+    // Refresh the list of tables or bills
+    fetchTables(); // or whatever function loads your tables
+    setCurrentBill(null); // Clear the current bill
+
+    // If you're using a modal, close it
+    setShowBillModal(false);
+  };
+
+  return (
+    <div>
+      {/* Render your bill details here */}
+      {currentBill ? (
+        <div>
+          <h2>Bill for Table {tableId}</h2>
+          {/* Render bill details */}
+        </div>
+      ) : (
+        <p>No pending bill for this table.</p>
+      )}
+    </div>
+  );
+};
+
+// Pass this to your payment component
+<PaymentComponent onPaymentSuccess={handlePaymentProcessed} />;
+
+export default TableBill;
