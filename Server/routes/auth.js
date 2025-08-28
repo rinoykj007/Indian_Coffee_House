@@ -1,6 +1,10 @@
 const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
+const corsMiddleware = require("../middleware/cors");
+
+// Apply CORS middleware to all auth routes
+router.use(corsMiddleware);
 
 // POST /auth/login
 router.post("/login", async (req, res) => {
@@ -16,7 +20,7 @@ router.post("/login", async (req, res) => {
 
     // Find user in MongoDB
     const user = await User.findOne({
-      username: username
+      username: username,
     });
 
     if (!user || user.password !== password) {

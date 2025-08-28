@@ -23,24 +23,17 @@ const allowedOrigins = [
   "https://www.payasam.ie",
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      console.log("CORS request from origin:", origin);
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("CORS blocked origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    preflightContinue: false,
-    optionsSuccessStatus: 200,
-  })
-);
+// Configure CORS options
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+// Apply CORS middleware before routes
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -108,6 +101,13 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
+  console.log(
+    `🚀 Indian Coffee House Management Server running on port ${PORT}`
+  );
+  console.log(
+    `📊 API Documentation available at https://indian-coffee-house.vercel.app/health`
+  );
+});
   console.log(
     `🚀 Indian Coffee House Management Server running on port ${PORT}`
   );
