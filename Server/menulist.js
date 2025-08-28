@@ -44,7 +44,7 @@ export const menuData = [
     type: "Dessert",
     image:
       "https://img.freepik.com/free-photo/still-life-sweet-tang-yuan-arrangement_23-2149149071.jpg",
-    price: 5.5,
+    price: 5.0,
     originalPrice: 6.5,
     rating: 4.6,
     reviewCount: 280,
@@ -305,7 +305,7 @@ export const menuData = [
     type: "Snacks",
     image:
       "https://img.freepik.com/free-photo/fresh-pastry-wooden-background_78826-2271.jpg",
-    price: 2.0,
+    price: 2.5,
     originalPrice: 2.5,
     rating: 4.7,
     reviewCount: 290,
@@ -343,7 +343,7 @@ export const menuData = [
     type: "Snacks",
     image:
       "https://img.freepik.com/free-photo/chicken-pie-kurnik-that-is-beautifully-decorated-table_1150-23100.jpg",
-    price: 2.5,
+    price: 3.5,
     originalPrice: 3.0,
     rating: 4.8,
     reviewCount: 450,
@@ -381,7 +381,7 @@ export const menuData = [
     type: "Snacks",
     image:
       "https://img.freepik.com/free-photo/side-view-stuffed-chicken-roll-cherry-tomatoes_141793-5123.jpg",
-    price: 3.5,
+    price: 3.0,
     originalPrice: 4.0,
     rating: 4.6,
     reviewCount: 210,
@@ -419,7 +419,7 @@ export const menuData = [
     type: "Snacks",
     image:
       "https://img.freepik.com/free-photo/fried-qutabs-with-dried-berries_140725-4018.jpg",
-    price: 3.0,
+    price: 2.0,
     originalPrice: 3.5,
     rating: 4.4,
     reviewCount: 95,
@@ -1102,7 +1102,7 @@ export const menuData = [
     type: "Curry",
     image:
       "https://img.freepik.com/free-photo/baked-meatballs-chicken-fillet-tomato-sauce_2829-11139.jpg",
-    price: 14.0,
+    price: 6.0,
     originalPrice: 16.0,
     rating: 4.4,
     reviewCount: 320,
@@ -1552,7 +1552,7 @@ export const menuData = [
     type: "Kerala Specials",
     image:
       "https://images.picxy.com/cache/2021/4/7/ce65006e269397c79b8e53feef105315.jpg",
-    price: 14.0,
+    price: 10.0,
     originalPrice: 16.0,
     rating: 4.4,
     reviewCount: 180,
@@ -1614,7 +1614,7 @@ export const menuData = [
     type: "Kerala Specials",
     image:
       "https://lh3.ggpht.com/_OGMa3JuKVTk/TZ4dyUgrEtI/AAAAAAAAF-M/Ce65ZDpiPWU/DSC_1402_thumb%5B8%5D.jpg?imgmax=800",
-    price: 10.0,
+    price: 12.0,
     originalPrice: 12.0,
     rating: 4.6,
     reviewCount: 420,
@@ -1641,11 +1641,11 @@ export const menuData = [
   },
   {
     id: 42,
-    name: "Kappa Poty",
+    name: "Kappa Potty",
     type: "Kerala Specials",
     image:
       "https://b.zmtcdn.com/data/dish_photos/fdd/17027f9177f52f9bd8db399f8e7e0fdd.png",
-    price: 12.0,
+    price: 14.0,
     originalPrice: 14.0,
     rating: 4.3,
     reviewCount: 160,
@@ -1850,7 +1850,7 @@ export const menuData = [
     type: "South Varieties",
     image:
       "https://thumbs.dreamstime.com/b/delicious-masala-dosa-sides-vibrant-generated-ai-south-indian-crepe-filled-spiced-potatoes-vegetables-served-383817116.jpg",
-    price: 14.0,
+    price: 12.0,
     originalPrice: 16.0,
     rating: 4.5,
     reviewCount: 380,
@@ -1887,7 +1887,7 @@ export const menuData = [
     name: "Thattu Dosa",
     type: "South Varieties",
     image: "https://i.ytimg.com/vi/t0vCNQvZBDE/sddefault.jpg",
-    price: 12.0,
+    price: 8.0,
     originalPrice: 14.0,
     rating: 4.3,
     reviewCount: 185,
@@ -1924,7 +1924,7 @@ export const menuData = [
     type: "South Varieties",
     image:
       "https://revi.b-cdn.net/wp-content/uploads/2015/05/onion-uttapam-vert.jpg",
-    price: 8.5,
+    price: 10.0,
     originalPrice: 10.0,
     rating: 4.4,
     reviewCount: 290,
@@ -1962,7 +1962,7 @@ export const menuData = [
     type: "South Varieties",
     image:
       "https://thanjaigroup.com/thanjairestaurant/wp-content/uploads/2021/08/Uthappam-Article-2.jpg",
-    price: 10.5,
+    price: 14.0,
     originalPrice: 12.0,
     rating: 4.2,
     reviewCount: 210,
@@ -2158,7 +2158,7 @@ export const menuData = [
   },
   {
     id: 57,
-    name: "Black Coffee",
+    name: "Bru Coffee",
     type: "Drinks",
     image:
       "https://cdn.shopify.com/s/files/1/0918/3414/files/perfect-cup-black-coffee.jpg?v=1498751612",
@@ -2378,7 +2378,7 @@ export const menuData = [
     type: "Dessert",
     image:
       "https://vismaifood.com/storage/app/uploads/public/44e/993/010/thumb__700_0_0_0_auto.jpg",
-    price: 5.0,
+    price: 2.0,
     originalPrice: 6.0,
     rating: 4.7,
     reviewCount: 320,
@@ -2478,7 +2478,7 @@ export const menuData = [
     type: "Dessert",
     image:
       "https://www.indianhealthyrecipes.com/wp-content/uploads/2024/06/classic-chocolate-cake-recipe.jpg",
-    price: 3.0,
+    price: 2.0,
     originalPrice: 4.0,
     rating: 4.6,
     reviewCount: 400,
