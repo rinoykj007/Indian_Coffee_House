@@ -26,91 +26,99 @@ const Table = () => {
   const fetchPendingBills = async () => {
     try {
       console.log("=== FETCHING PENDING BILLS ===");
-      console.log("All tables:", tables);
 
-      // Get all tables - not just occupied ones, as table status might be out of sync with order status
-      console.log("Checking all tables for pending bills");
+      // Use a single API request to get all pending bills
+      const response = await makeAuthenticatedRequest(
+        "/payments/pending-bills"
+      );
 
-      const bills = [];
+      if (response.ok) {
+        const data = await response.json();
+        console.log("All pending bills fetched in one request:", data);
 
-      for (const table of tables) {
-        try {
-          const tableId = table._id || table.id;
-          console.log(
-            `Fetching bill for table ${table.tableNumber}, ID: ${tableId}`
-          );
+        if (data.success && data.bills) {
+          setPendingBills(data.bills);
 
-          const response = await makeAuthenticatedRequest(
-            `/payments/table/${tableId}/bill`
-          );
-          console.log(
-            `Response for table ${table.tableNumber}:`,
-            response.status
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log(`Bill data for table ${table.tableNumber}:`, data);
-
-            if (data.success && data.bill) {
-              console.log(
-                `Found bill for table ${table.tableNumber}, adding to pending bills`
-              );
-              bills.push(data.bill);
-            }
-          } else if (response.status !== 404) {
-            const errorData = await response.text();
-            console.error(
-              `Error response for table ${table.tableNumber}:`,
-              errorData
-            );
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching bill for table ${table.tableNumber}:`,
-            error
-          );
+          // Update table statuses to match the pending bills
+          updateTablesBasedOnBills(data.bills);
+        } else {
+          setPendingBills([]);
         }
-      }
+      } else {
+        console.error("Failed to fetch pending bills:", response.status);
 
-      console.log("Final bills array:", bills);
-      setPendingBills(bills);
-
-      // If we found bills for tables marked as available, update their status
-      for (const bill of bills) {
-        const table = tables.find((t) => (t._id || t.id) === bill.tableId);
-        if (table && table.status === "available") {
-          console.log(
-            `Table ${bill.tableNumber} has pending bill but status is available. Updating status to occupied.`
-          );
-          await updateTableStatus(bill.tableId, "occupied");
-        }
+        // Fallback to old method if the new API endpoint doesn't exist
+        await fetchPendingBillsLegacy();
       }
     } catch (error) {
       console.error("Error fetching pending bills:", error);
+      // Fallback to old method
+      await fetchPendingBillsLegacy();
+    }
+  };
+
+  // Move the old implementation to a fallback method
+  const fetchPendingBillsLegacy = async () => {
+    console.log("Falling back to legacy bill fetching method");
+    const bills = [];
+
+    // Only check occupied tables to reduce requests
+    const occupiedTables = tables.filter(
+      (table) => table.status === "occupied"
+    );
+
+    for (const table of occupiedTables) {
+      try {
+        const tableId = table._id || table.id;
+        const response = await makeAuthenticatedRequest(
+          `/payments/table/${tableId}/bill`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.bill) {
+            bills.push(data.bill);
+          }
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching bill for table ${table.tableNumber}:`,
+          error
+        );
+      }
+    }
+
+    setPendingBills(bills);
+  };
+
+  const updateTablesBasedOnBills = async (bills) => {
+    // Update table statuses to match pending bills
+    for (const bill of bills) {
+      const table = tables.find(
+        (t) => String(t._id || t.id) === String(bill.tableId)
+      );
+      if (table && table.status === "available") {
+        await updateTableStatus(bill.tableId, "occupied");
+      }
     }
   };
 
   const fetchTables = async () => {
     try {
       const response = await makeAuthenticatedRequest("/tables");
-      const data = await response.json();
-      setTables(data.tables || []);
+      if (response.ok) {
+        const data = await response.json();
+        setTables(data.tables || []);
+      } else {
+        console.error(
+          "Error fetching tables: Server returned",
+          response.status
+        );
+        setTables([]); // Set empty array instead of dummy data
+      }
     } catch (error) {
       console.error("Error fetching tables:", error);
-      // Create dummy tables if API fails
-      setTables([
-        { id: 1, tableNumber: 1, status: "available" },
-        { id: 2, tableNumber: 2, status: "occupied" },
-        { id: 3, tableNumber: 3, status: "available" },
-        { id: 4, tableNumber: 4, status: "available" },
-        { id: 5, tableNumber: 5, status: "occupied" },
-        { id: 6, tableNumber: 6, status: "available" },
-        { id: 7, tableNumber: 7, status: "available" },
-        { id: 8, tableNumber: 8, status: "occupied" },
-        { id: 9, tableNumber: 9, status: "available" },
-        { id: 10, tableNumber: 10, status: "available" },
-      ]);
+      setTables([]); // Set empty array instead of dummy data
     } finally {
       setLoading(false);
     }

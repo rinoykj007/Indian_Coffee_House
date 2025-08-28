@@ -292,4 +292,52 @@ router.get("/daily", async (req, res) => {
   }
 });
 
+// GET /api/payments/pending-bills - Get all pending bills at once
+router.get("/pending-bills", async (req, res) => {
+  try {
+    // Find all pending orders
+    const pendingOrders = await Order.find({
+      status: "pending",
+    }).populate("tableId", "tableNumber");
+
+    if (!pendingOrders || pendingOrders.length === 0) {
+      return res.json({
+        success: true,
+        bills: [],
+      });
+    }
+
+    // Convert orders to bills
+    const bills = pendingOrders.map((order) => {
+      const itemsCount = order.items.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+
+      return {
+        orderId: order._id,
+        orderNumber: order.orderNumber,
+        tableId: order.tableId._id,
+        tableNumber: order.tableId.tableNumber,
+        items: order.items,
+        itemsCount: itemsCount,
+        subtotal: order.total,
+        totalAmount: order.total,
+        createdAt: order.createdAt,
+      };
+    });
+
+    res.json({
+      success: true,
+      bills: bills,
+    });
+  } catch (error) {
+    console.error("Error fetching pending bills:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch pending bills",
+    });
+  }
+});
+
 module.exports = router;
