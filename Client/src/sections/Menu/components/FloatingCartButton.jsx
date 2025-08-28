@@ -1,6 +1,6 @@
 import React from "react";
 
-const FloatingCartButton = ({ cart, setShowOrderPopup }) => (
+const FloatingCartButton = ({ cart, setShowOrderPopup }) =>
   cart.length > 0 && (
     <div className="fixed bottom-6 right-6 z-50">
       <button
@@ -15,7 +15,6 @@ const FloatingCartButton = ({ cart, setShowOrderPopup }) => (
         </div>
       </button>
     </div>
-  )
-);
+  );
 
 export default FloatingCartButton;

@@ -89,7 +89,18 @@ export default function Meanulist() {
       });
   }, []);
 
-  if (loading) return <div>Loading menu...</div>;
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="loader-spinner w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Indian Coffee House
+          </h2>
+          <p className="text-amber-400">Loading authentic flavors...</p>
+        </div>
+      </div>
+    );
   if (error) return <div>{error}</div>;
 
   // Get unique categories/types for filter dropdown

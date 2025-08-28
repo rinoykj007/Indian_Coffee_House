@@ -13,7 +13,7 @@ import {
 const MenuPage = () => {
   const { user, makeAuthenticatedRequest } = useAuth();
   const navigate = useNavigate();
-  const { tableParam } = useParams(); // This will be "table-5" format
+  const { tableParam } = useParams();
   const location = useLocation();
 
   const [menuItems, setMenuItems] = useState([]);
@@ -33,15 +33,6 @@ const MenuPage = () => {
 
   // Get the actual table ID for API calls
   const tableId = location.state?.tableId;
-
-  // Debug: Log navigation state and table ID
-  console.log("=== MENUPAGE DEBUG ===");
-  console.log("Location state:", location.state);
-  console.log("Table ID received:", tableId);
-  console.log("Table info:", tableInfo);
-  console.log("Is additional order:", location.state?.isAdditionalOrder);
-  console.log("=====================");
-
   useEffect(() => {
     fetchMenuItems();
 
@@ -157,7 +148,7 @@ const MenuPage = () => {
 
         finalOrderData = {
           tableId: tableId,
-          items: newItems, // Only send new items
+          items: newItems,
           customerCount: existingOrder.customerCount || 1,
           specialRequests: existingOrder.specialRequests || "",
           orderId: existingOrder.id,
