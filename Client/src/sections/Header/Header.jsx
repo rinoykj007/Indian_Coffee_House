@@ -180,15 +180,6 @@ export default function Header({ headerRef, aboutRef, navItems }) {
           >
             Order Now →
           </button>
-          {/* GitHub Link/Button */}
-          <a
-            href="https://github.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-2 text-xs text-slate-300 hover:text-yellow-400 underline"
-          >
-            View on GitHub
-          </a>
 
           <div className="flex items-center gap-3 mt-4 sm:mt-6">
             <div className="flex -space-x-2">
