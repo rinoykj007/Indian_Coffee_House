@@ -365,7 +365,7 @@ const Table = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-amber-600 text-lg">
-                          ₹{bill.totalAmount}
+                          €{bill.totalAmount}
                         </p>
                       </div>
                     </div>
@@ -391,7 +391,7 @@ const Table = () => {
                                 </span>
                               </div>
                               <div className="text-slate-800 font-medium">
-                                ₹{(item.price * item.quantity).toFixed(0)}
+                                €{(item.price * item.quantity).toFixed(0)}
                               </div>
                             </div>
                           ))}
@@ -404,7 +404,7 @@ const Table = () => {
                         <div className="flex justify-between font-semibold text-base mt-2">
                           <span className="text-slate-800">Total Amount:</span>
                           <span className="text-amber-600">
-                            ₹{bill.totalAmount}
+                            €{bill.totalAmount}
                           </span>
                         </div>
                       </div>

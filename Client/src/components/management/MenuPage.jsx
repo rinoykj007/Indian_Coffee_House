@@ -117,12 +117,14 @@ const MenuPage = () => {
 
   const updateOrderTotal = () => {
     const total = orderItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) =>
+        sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0),
       0
     );
     setOrderTotal(total);
   };
 
+  // Modify the submitOrder function to handle some common edge cases
   const submitOrder = async () => {
     if (orderItems.length === 0) return;
 
@@ -132,99 +134,157 @@ const MenuPage = () => {
     }
 
     try {
-      let finalOrderData;
+      // Add detailed logging to debug the issue
+      console.log("Order items before processing:", orderItems);
+      console.log("Table ID:", tableId);
+      console.log("Location state:", location.state);
+
+      // Define isAdditionalOrder here
       const isAdditionalOrder =
         location.state?.isAdditionalOrder && existingOrder;
 
-      if (isAdditionalOrder) {
-        // Only send NEW items for update - backend will handle combining
-        const newItems = orderItems.map((item) => ({
-          menuItemId: item._id,
-          quantity: item.quantity,
-          price: item.price,
-          name: item.name,
+      // Make sure the newItems are properly formatted with numeric prices
+      const newItems = orderItems.map((item) => {
+        // Ensure we have valid ID, using _id as primary and id as fallback
+        const menuItemId = item._id || item.id;
+        const price = parseFloat(item.price);
+        const quantity = parseInt(item.quantity);
+
+        // Log individual item details for debugging
+        console.log(
+          `Processing item ${item.name}: price=${price}, quantity=${quantity}, id=${menuItemId}`
+        );
+
+        return {
+          menuItemId: menuItemId,
+          quantity: quantity || 1,
+          price: price || 0,
+          name: item.name || "Unknown Item",
           specialNotes: "",
-        }));
-
-        finalOrderData = {
-          tableId: tableId,
-          items: newItems,
-          customerCount: existingOrder.customerCount || 1,
-          specialRequests: existingOrder.specialRequests || "",
-          orderId: existingOrder.id,
-          isUpdate: true,
         };
-
-        console.log("Adding NEW items to existing order:", finalOrderData);
-        console.log("New items only:", newItems);
-      } else {
-        // New order
-        const newItems = orderItems.map((item) => ({
-          menuItemId: item._id,
-          quantity: item.quantity,
-          price: item.price,
-          name: item.name,
-          specialNotes: "",
-        }));
-
-        finalOrderData = {
-          tableId: tableId,
-          items: newItems,
-          customerCount: 1,
-          specialRequests: "",
-          total: orderTotal,
-          isUpdate: false,
-        };
-
-        console.log("Creating new order:", finalOrderData);
-      }
-
-      console.log("Submitting order data:", finalOrderData);
-
-      const response = await makeAuthenticatedRequest("/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(finalOrderData),
       });
 
-      console.log("Order submission response status:", response.status);
+      // Filter out any items with invalid prices or quantities
+      const validItems = newItems.filter(
+        (item) => item.price > 0 && item.quantity > 0 && !isNaN(item.price)
+      );
 
-      if (response.ok) {
-        // Update table status to occupied after successful order (only for new orders)
-        if (!isAdditionalOrder) {
-          try {
-            await makeAuthenticatedRequest(`/tables/${tableId}/status`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ status: "occupied" }),
-            });
-          } catch (error) {
-            console.error("Error updating table status:", error);
+      console.log("Valid items after filtering:", validItems);
+
+      // Modify the finalOrderData to ensure MongoDB compatibility
+      const finalOrderData = isAdditionalOrder
+        ? {
+            tableId: tableId,
+            items: validItems.map((item) => ({
+              ...item,
+              // Ensure menuItemId is a string for MongoDB ObjectId compatibility
+              menuItemId: String(item.menuItemId),
+            })),
+            customerCount: existingOrder?.customerCount || 1,
+            specialRequests: existingOrder?.specialRequests || "",
+            orderId: existingOrder?._id || "",
+            isUpdate: true,
           }
-        }
+        : {
+            tableId: String(tableId), // Ensure tableId is a string
+            items: validItems.map((item) => ({
+              ...item,
+              // Ensure menuItemId is a string for MongoDB ObjectId compatibility
+              menuItemId: String(item.menuItemId),
+            })),
+            customerCount: 1,
+            specialRequests: "",
+            isUpdate: false,
+          };
 
-        const message = isAdditionalOrder
-          ? `Items added to Table ${tableInfo?.tableNumber}! Total: ₹${finalOrderData.total}`
-          : `Order placed for Table ${tableInfo?.tableNumber}! Total: ₹${finalOrderData.total}`;
+      // Add API version for debugging
+      console.log("API endpoint being called:", `/orders`);
+      console.log("Final order data:", JSON.stringify(finalOrderData, null, 2));
 
-        alert(message);
-        navigate("/management/staff");
-      } else {
-        const errorData = await response.json();
-        console.error("Order submission failed:", {
-          status: response.status,
-          error: errorData,
-          submittedData: finalOrderData,
+      // Try using fetch directly once to see if it's an issue with makeAuthenticatedRequest
+      try {
+        const API_BASE = `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000"
+        }/api`;
+        console.log("Trying direct fetch to:", `${API_BASE}/orders`);
+
+        const token = localStorage.getItem("token");
+
+        const response = await makeAuthenticatedRequest("/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(finalOrderData),
         });
+
+        console.log("Order submission response status:", response.status);
+
+        if (response.ok) {
+          // Parse response as JSON only once
+          const responseData = await response.json();
+          console.log("Success response:", responseData);
+
+          // Update table status to occupied after successful order (only for new orders)
+          if (!isAdditionalOrder) {
+            try {
+              await makeAuthenticatedRequest(`/tables/${tableId}/status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "occupied" }),
+              });
+            } catch (error) {
+              console.error("Error updating table status:", error);
+            }
+          }
+
+          const orderTotal = responseData.order?.total || orderTotal;
+          const message = isAdditionalOrder
+            ? `Items added to Table ${tableInfo?.tableNumber}! Total: €${orderTotal}`
+            : `Order placed for Table ${tableInfo?.tableNumber}! Total: €${orderTotal}`;
+
+          alert(message);
+          navigate("/management/staff");
+        } else {
+          // For error responses, use clone() before reading the body
+          const clonedResponse = response.clone();
+          let errorMessage = "Server error";
+
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || "Unknown error";
+          } catch (e) {
+            // If JSON parsing fails, try getting text
+            try {
+              const errorText = await clonedResponse.text();
+              errorMessage = errorText || "Server error";
+            } catch (textError) {
+              console.error("Failed to read error response:", textError);
+            }
+          }
+
+          console.error("Order submission failed:", {
+            status: response.status,
+            errorMessage,
+          });
+
+          alert(`Failed to submit order: ${errorMessage}. Please try again.`);
+        }
+      } catch (fetchError) {
+        console.error("Network error:", fetchError);
         alert(
-          `Failed to submit order: ${
-            errorData.error || "Unknown error"
-          }. Please try again.`
+          `Network error: ${fetchError.message}. Please check your connection.`
         );
       }
     } catch (error) {
-      console.error("Error submitting order:", error);
-      alert("Error submitting order. Please try again.");
+      // Add more detailed error logging
+      console.error("Error submitting order:", error.message || error);
+      console.error("Error stack:", error.stack);
+      alert(
+        `Error submitting order: ${
+          error.message || "Unknown error"
+        }. Please try again.`
+      );
     }
   };
 
@@ -284,7 +344,7 @@ const MenuPage = () => {
                     {orderItems.length} items
                   </span>
                   <span className="text-base font-bold ml-2 text-amber-300">
-                    ₹{orderTotal}
+                    €{orderTotal}
                   </span>
                 </button>
               </div>
@@ -360,7 +420,7 @@ const MenuPage = () => {
                         {item.name}
                       </h3>
                       <p className="text-lg font-bold text-amber-600 ml-4">
-                        ₹{item.price}
+                        €{item.price}
                       </p>
                     </div>
 
@@ -424,7 +484,7 @@ const MenuPage = () => {
           >
             <ShoppingCart className="w-5 h-5" />
             <span>Submit Order</span>
-            <span className="ml-2 text-base font-bold">₹{orderTotal}</span>
+            <span className="ml-2 text-base font-bold"> €{orderTotal}</span>
           </button>
         </div>
       )}

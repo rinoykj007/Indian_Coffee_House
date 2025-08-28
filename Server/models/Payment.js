@@ -17,7 +17,7 @@ const paymentSchema = new mongoose.Schema({
     required: true,
   },
   orderNumber: {
-    type: Number,
+    type: String, // Changed from Number to String to match the format "20250828-003"
     required: true,
   },
   tableNumber: {

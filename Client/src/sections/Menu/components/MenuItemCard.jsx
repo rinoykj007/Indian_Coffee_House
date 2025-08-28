@@ -48,7 +48,7 @@ const MenuItemCard = ({ item, index, addToCart }) => {
         {/* Price & Rating */}
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg font-bold text-green-600">
-            ${item.price || Math.floor(Math.random() * 15) + 8}
+            €{item.price || Math.floor(Math.random() * 15) + 8}
           </span>
           <div className="flex items-center space-x-1">
             {[...Array(5)].map((_, i) => (

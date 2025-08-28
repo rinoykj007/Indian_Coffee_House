@@ -271,7 +271,7 @@ const AdminDashboard = () => {
               />
               <StatCard
                 title="Today's Revenue"
-                value={`₹${stats.todayRevenue.toFixed(2)}`}
+                value={` €${stats.todayRevenue.toFixed(2)}`}
                 icon={DollarSign}
                 color="text-green-600"
               />
@@ -348,7 +348,7 @@ const AdminDashboard = () => {
                       New order received
                     </p>
                     <p className="text-xs text-slate-600">
-                      Table 5 - ₹850 - 2 minutes ago
+                      Table 5 - €850 - 2 minutes ago
                     </p>
                   </div>
                 </div>
@@ -361,7 +361,7 @@ const AdminDashboard = () => {
                       Payment completed
                     </p>
                     <p className="text-xs text-slate-600">
-                      Table 3 - ₹1,200 - 5 minutes ago
+                      Table 3 - €1,200 - 5 minutes ago
                     </p>
                   </div>
                 </div>
@@ -449,7 +449,7 @@ const AdminDashboard = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">
-                        Price (₹)
+                        Price ( €)
                       </label>
                       <input
                         type="number"
@@ -539,7 +539,7 @@ const AdminDashboard = () => {
                   </div>
                   <p className="text-sm text-slate-600 mb-2">{item.type}</p>
                   <p className="text-lg font-bold text-amber-600">
-                    ₹{item.price}
+                    €{item.price}
                   </p>
                   <p className="text-sm text-slate-600 mt-2">
                     {item.description}
@@ -840,7 +840,7 @@ const AdminDashboard = () => {
                               {order.items?.length || 0} items
                             </td>
                             <td className="py-3 px-4 text-slate-800 font-semibold">
-                              ₹{order.total || 0}
+                              €{order.total || 0}
                             </td>
                             <td className="py-3 px-4">
                               <span
@@ -918,7 +918,7 @@ const AdminDashboard = () => {
                       Today's Revenue
                     </p>
                     <p className="text-3xl font-bold text-green-600 mt-1">
-                      ₹
+                      €
                       {recentOrders
                         .filter((order) => {
                           const orderDate = new Date(order.orderDate);
@@ -943,7 +943,7 @@ const AdminDashboard = () => {
                       Avg Order Value
                     </p>
                     <p className="text-3xl font-bold text-amber-600 mt-1">
-                      ₹
+                      €
                       {recentOrders.length > 0
                         ? Math.round(
                             recentOrders.reduce(

@@ -23,7 +23,7 @@ export default function Footer({ footerRef }) {
             </div>
             <div>
               <div className="text-sm text-gray-300">Call us</div>
-              <div className="text-sm font-medium">+353 1 234 5678</div>
+              <div className="text-sm font-medium">+353 89 483 3944</div>
             </div>
           </div>
           <div className="flex items-center justify-center md:justify-end space-x-3">
@@ -32,9 +32,7 @@ export default function Footer({ footerRef }) {
             </div>
             <div>
               <div className="text-sm text-gray-300">Mail us</div>
-              <div className="text-sm font-medium">
-                info@indiancoffeehouse.ie
-              </div>
+              <div className="text-sm font-medium">info@Payasam.ie</div>
             </div>
           </div>
         </div>
@@ -46,10 +44,7 @@ export default function Footer({ footerRef }) {
           <div className="flex-1 min-w-[250px]">
             <div className="flex items-center space-x-3 mb-4">
               <div className="text-start">
-                <h3 className="text-xl font-bold text-white">INDIAN</h3>
-                <p className="text-orange-400 text-sm font-medium">
-                  COFFEE HOUSE
-                </p>
+                <h3 className="text-xl font-bold text-white">Payasam</h3>
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4 text-start">

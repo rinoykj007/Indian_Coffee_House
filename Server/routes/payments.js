@@ -112,6 +112,14 @@ router.post("/process", async (req, res) => {
       notes = "",
     } = req.body;
 
+    console.log("Payment process request:", {
+      orderId,
+      tableId,
+      paymentMethod,
+      discount,
+      staffId,
+    });
+
     if (!orderId || !tableId || !paymentMethod) {
       return res.status(400).json({
         success: false,
@@ -126,6 +134,7 @@ router.post("/process", async (req, res) => {
     );
 
     if (!order) {
+      console.error(`Order not found with ID: ${orderId}`);
       return res.status(404).json({
         success: false,
         error: "Order not found",
@@ -157,9 +166,9 @@ router.post("/process", async (req, res) => {
     // Create payment record
     const payment = new Payment({
       orderId: order._id,
-      tableId: order.tableId._id,
+      tableId: tableId,
       orderNumber: order.orderNumber || Math.floor(Math.random() * 10000), // Fallback if orderNumber is missing
-      tableNumber: order.tableId.tableNumber,
+      tableNumber: order.tableId?.tableNumber || 0,
       itemsCount: itemsCount,
       subtotal: subtotal,
       discount: discount,
@@ -170,11 +179,18 @@ router.post("/process", async (req, res) => {
       notes: notes,
     });
 
+    console.log("Created payment record:", {
+      orderId: payment.orderId,
+      tableId: payment.tableId,
+      totalAmount: payment.totalAmount,
+    });
+
     const savedPayment = await payment.save();
 
     // Update order status to paid
     order.status = "paid";
     await order.save();
+    console.log("Order status updated to paid");
 
     // Update table status to available
     const updatedTable = await Table.findByIdAndUpdate(
@@ -187,14 +203,17 @@ router.post("/process", async (req, res) => {
     res.json({
       success: true,
       payment: savedPayment,
-      table: updatedTable, // Add this line
-      message: `Payment of ₹${totalAmount} processed successfully for Table ${order.tableId.tableNumber}`,
+      table: updatedTable,
+      message: `Payment of €${totalAmount} processed successfully for Table ${
+        order.tableId?.tableNumber || "unknown"
+      }`,
     });
   } catch (error) {
     console.error("Error processing payment:", error);
+    console.error("Error stack:", error.stack);
     res.status(500).json({
       success: false,
-      error: "Failed to process payment",
+      error: "Failed to process payment: " + (error.message || "Unknown error"),
     });
   }
 });
