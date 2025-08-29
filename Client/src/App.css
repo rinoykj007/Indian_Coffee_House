@@ -676,8 +676,9 @@ footer .newsletter i,
 header {
   height: calc(100vh - 22px);
   background-size: cover;
-  background: url("https://res.cloudinary.com/abdel-rahman-ali/image/upload/v1535988534/header.jpg")
-    fixed bottom;
+  /* background: url("https://res.cloudinary.com/abdel-rahman-ali/image/upload/v1535988534/header.jpg") */
+  /* fixed bottom; */
+  background-image: url("./assets/headerbackground.jpg");
   padding: 20px 70px;
 }
 header nav {
