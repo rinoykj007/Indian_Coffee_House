@@ -12,6 +12,7 @@ import {
   LogOut,
   PlusCircle,
 } from "lucide-react";
+import logo from "./logo.png";
 
 const AdminDashboard = () => {
   const { user, logout, makeAuthenticatedRequest } = useAuth();
@@ -31,14 +32,21 @@ const AdminDashboard = () => {
   const [staffMembers, setStaffMembers] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
   const [showAddMenuItem, setShowAddMenuItem] = useState(false);
+  const [showEditMenuItem, setShowEditMenuItem] = useState(false);
   const [showAddStaff, setShowAddStaff] = useState(false);
+  const [currentMenuItem, setCurrentMenuItem] = useState(null);
 
   // Form states for adding new items
   const [newMenuItem, setNewMenuItem] = useState({
+    id: Math.floor(Math.random() * 10000), // Generate a random ID
     name: "",
     type: "",
+    image: "https://via.placeholder.com/400x300?text=Menu+Item", // Default image
     price: "",
+    rating: 5.0,
+    reviewCount: 0,
     description: "",
+    category: "",
     available: true,
   });
 
@@ -96,29 +104,193 @@ const AdminDashboard = () => {
   const handleAddMenuItem = async (e) => {
     e.preventDefault();
     try {
+      // Generate a random ID if not provided and ensure all fields are present and of the correct type
+      const menuItemWithId = {
+        ...newMenuItem,
+        id: parseInt(newMenuItem.id || Math.floor(Math.random() * 10000)),
+        price: parseFloat(newMenuItem.price),
+        rating: parseFloat(newMenuItem.rating),
+        reviewCount: parseInt(newMenuItem.reviewCount),
+      };
+
+      // Log the data being sent
+      console.log("Sending menu item data:", menuItemWithId);
+
+      // Check if all required fields are present
+      const requiredFields = [
+        "id",
+        "name",
+        "type",
+        "image",
+        "price",
+        "rating",
+        "reviewCount",
+        "description",
+        "category",
+      ];
+      const missingFields = requiredFields.filter(
+        (field) => !menuItemWithId[field]
+      );
+
+      if (missingFields.length > 0) {
+        alert(`Missing required fields: ${missingFields.join(", ")}`);
+        return;
+      }
+
       const response = await makeAuthenticatedRequest("/menu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newMenuItem),
+        body: JSON.stringify(menuItemWithId),
       });
 
       if (response.ok) {
         alert("Menu item added successfully!");
         setNewMenuItem({
+          id: Math.floor(Math.random() * 10000),
           name: "",
           type: "",
+          image: "https://via.placeholder.com/400x300?text=Menu+Item",
           price: "",
+          rating: 5.0,
+          reviewCount: 0,
           description: "",
+          category: "",
           available: true,
         });
         setShowAddMenuItem(false);
         fetchTabData(); // Refresh menu items
       } else {
-        alert("Failed to add menu item");
+        // Try to get more detailed error information
+        try {
+          const errorData = await response.json();
+          console.error("Server error details:", errorData);
+          alert(
+            `Failed to add menu item: ${errorData.error || "Unknown error"}`
+          );
+        } catch (e) {
+          alert(`Failed to add menu item: ${response.statusText}`);
+        }
       }
     } catch (error) {
       console.error("Error adding menu item:", error);
-      alert("Error adding menu item");
+      alert(`Error adding menu item: ${error.message}`);
+    }
+  };
+
+  const handleEditMenuItem = (item) => {
+    setCurrentMenuItem(item);
+    setNewMenuItem({
+      id: item.id || Math.floor(Math.random() * 10000),
+      name: item.name,
+      type: item.type || "",
+      image: item.image || "https://via.placeholder.com/400x300?text=Menu+Item",
+      price: item.price || "",
+      rating: item.rating || 5.0,
+      reviewCount: item.reviewCount || 0,
+      description: item.description || "",
+      category: item.category || item.type || "",
+      available: item.available !== false, // default to true if not specified
+    });
+    setShowEditMenuItem(true);
+  };
+
+  const handleUpdateMenuItem = async (e) => {
+    e.preventDefault();
+    try {
+      // Ensure all fields are of the correct type
+      const updatedMenuItem = {
+        ...newMenuItem,
+        id: parseInt(newMenuItem.id || Math.floor(Math.random() * 10000)),
+        price: parseFloat(newMenuItem.price),
+        rating: parseFloat(newMenuItem.rating),
+        reviewCount: parseInt(newMenuItem.reviewCount),
+      };
+
+      // Log the data being sent
+      console.log("Updating menu item data:", updatedMenuItem);
+
+      // Check if all required fields are present
+      const requiredFields = [
+        "id",
+        "name",
+        "type",
+        "image",
+        "price",
+        "rating",
+        "reviewCount",
+        "description",
+        "category",
+      ];
+      const missingFields = requiredFields.filter(
+        (field) => !updatedMenuItem[field]
+      );
+
+      if (missingFields.length > 0) {
+        alert(`Missing required fields: ${missingFields.join(", ")}`);
+        return;
+      }
+
+      const response = await makeAuthenticatedRequest(
+        `/menu/${currentMenuItem._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedMenuItem),
+        }
+      );
+
+      if (response.ok) {
+        alert("Menu item updated successfully!");
+        setNewMenuItem({
+          id: Math.floor(Math.random() * 10000),
+          name: "",
+          type: "",
+          image: "https://via.placeholder.com/400x300?text=Menu+Item",
+          price: "",
+          rating: 5.0,
+          reviewCount: 0,
+          description: "",
+          category: "",
+          available: true,
+        });
+        setShowEditMenuItem(false);
+        setCurrentMenuItem(null);
+        fetchTabData(); // Refresh menu items
+      } else {
+        // Try to get more detailed error information
+        try {
+          const errorData = await response.json();
+          console.error("Server error details:", errorData);
+          alert(
+            `Failed to update menu item: ${errorData.error || "Unknown error"}`
+          );
+        } catch (e) {
+          alert(`Failed to update menu item: ${response.statusText}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating menu item:", error);
+      alert(`Error updating menu item: ${error.message}`);
+    }
+  };
+
+  const handleDeleteMenuItem = async (itemId) => {
+    if (window.confirm("Are you sure you want to delete this menu item?")) {
+      try {
+        const response = await makeAuthenticatedRequest(`/menu/${itemId}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          alert("Menu item deleted successfully!");
+          fetchTabData(); // Refresh menu items
+        } else {
+          alert("Failed to delete menu item");
+        }
+      } catch (error) {
+        console.error("Error deleting menu item:", error);
+        alert("Error deleting menu item");
+      }
     }
   };
 
@@ -466,6 +638,87 @@ const AdminDashboard = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Image URL
+                      </label>
+                      <input
+                        type="text"
+                        value={newMenuItem.image}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            image: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Category
+                      </label>
+                      <select
+                        value={newMenuItem.category}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            category: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      >
+                        <option value="">Select Category</option>
+                        <option value="South Varieties (Dosa)">
+                          South Varieties (Dosa)
+                        </option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Meals">Meals</option>
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Rating (1-5)
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="5"
+                          step="0.1"
+                          value={newMenuItem.rating}
+                          onChange={(e) =>
+                            setNewMenuItem({
+                              ...newMenuItem,
+                              rating: e.target.value,
+                            })
+                          }
+                          className="w-full p-2 border border-slate-300 rounded-lg"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Review Count
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={newMenuItem.reviewCount}
+                          onChange={(e) =>
+                            setNewMenuItem({
+                              ...newMenuItem,
+                              reviewCount: e.target.value,
+                            })
+                          }
+                          className="w-full p-2 border border-slate-300 rounded-lg"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
                         Description
                       </label>
                       <textarea
@@ -516,34 +769,304 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {/* Edit Menu Item Modal */}
+            {showEditMenuItem && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-4">
+                    Edit Menu Item
+                  </h3>
+                  <form onSubmit={handleUpdateMenuItem} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newMenuItem.name}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            name: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Type
+                      </label>
+                      <select
+                        value={newMenuItem.type}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            type: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      >
+                        <option value="">Select Type</option>
+                        <option value="appetizer">Appetizer</option>
+                        <option value="main">Main Course</option>
+                        <option value="dessert">Dessert</option>
+                        <option value="beverage">Beverage</option>
+                        <option value="snack">Snack</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Price (€)
+                      </label>
+                      <input
+                        type="number"
+                        value={newMenuItem.price}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            price: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Image URL
+                      </label>
+                      <input
+                        type="text"
+                        value={newMenuItem.image}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            image: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Category
+                      </label>
+                      <select
+                        value={newMenuItem.category}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            category: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        required
+                      >
+                        <option value="">Select Category</option>
+                        <option value="South Varieties (Dosa)">
+                          South Varieties (Dosa)
+                        </option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Meals">Meals</option>
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Rating (1-5)
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="5"
+                          step="0.1"
+                          value={newMenuItem.rating}
+                          onChange={(e) =>
+                            setNewMenuItem({
+                              ...newMenuItem,
+                              rating: e.target.value,
+                            })
+                          }
+                          className="w-full p-2 border border-slate-300 rounded-lg"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Review Count
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={newMenuItem.reviewCount}
+                          onChange={(e) =>
+                            setNewMenuItem({
+                              ...newMenuItem,
+                              reviewCount: e.target.value,
+                            })
+                          }
+                          className="w-full p-2 border border-slate-300 rounded-lg"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        value={newMenuItem.description}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            description: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border border-slate-300 rounded-lg"
+                        rows="3"
+                        required
+                      ></textarea>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="editItemAvailable"
+                        checked={newMenuItem.available}
+                        onChange={(e) =>
+                          setNewMenuItem({
+                            ...newMenuItem,
+                            available: e.target.checked,
+                          })
+                        }
+                        className="rounded"
+                      />
+                      <label className="text-sm text-slate-700">
+                        Available
+                      </label>
+                    </div>
+                    <div className="flex space-x-4">
+                      <button
+                        type="submit"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+                      >
+                        Update Item
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowEditMenuItem(false);
+                          setCurrentMenuItem(null);
+                          setNewMenuItem({
+                            id: Math.floor(Math.random() * 10000),
+                            name: "",
+                            type: "",
+                            image:
+                              "https://via.placeholder.com/400x300?text=Menu+Item",
+                            price: "",
+                            rating: 5.0,
+                            reviewCount: 0,
+                            description: "",
+                            category: "",
+                            available: true,
+                          });
+                        }}
+                        className="flex-1 bg-slate-600 hover:bg-slate-700 text-white py-2 rounded-lg"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
             {/* Menu Items Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {menuItems.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-white rounded-lg shadow-lg border border-amber-200 p-4"
+                  className="bg-white rounded-lg shadow-lg border border-amber-200 overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-slate-800">
-                      {item.name}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        item.available
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {item.available ? "Available" : "Unavailable"}
-                    </span>
+                  <div className="h-40 overflow-hidden relative">
+                    <img
+                      src={
+                        item.image ||
+                        "https://via.placeholder.com/400x300?text=Menu+Item"
+                      }
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          item.available
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {item.available ? "Available" : "Unavailable"}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-sm text-slate-600 mb-2">{item.type}</p>
-                  <p className="text-lg font-bold text-amber-600">
-                    €{item.price}
-                  </p>
-                  <p className="text-sm text-slate-600 mt-2">
-                    {item.description}
-                  </p>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-slate-800 text-lg">
+                        {item.name}
+                      </h3>
+                      <p className="text-lg font-bold text-amber-600">
+                        €{item.price}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center mb-2 space-x-2">
+                      <span className="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                        {item.type}
+                      </span>
+                      <span className="text-xs font-medium px-2 py-1 bg-purple-100 text-purple-800 rounded-full">
+                        {item.category || "Uncategorized"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center mb-2 text-sm text-slate-600">
+                      <div className="flex items-center mr-3">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-yellow-500 mr-1"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
+                        </svg>
+                        <span>
+                          {item.rating} ({item.reviewCount} reviews)
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-slate-600 mt-2 mb-3 line-clamp-2">
+                      {item.description}
+                    </p>
+
+                    <div className="flex justify-end space-x-2 mt-3 pt-3 border-t border-gray-200">
+                      <button
+                        onClick={() => handleEditMenuItem(item)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMenuItem(item._id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1022,9 +1545,7 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="bg-amber-600 p-1.5 sm:p-2 rounded-full">
-                <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              <img src={logo} alt="" className="w-10 h-10" />
               <div>
                 <h1 className="text-lg sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-sm:text-xl md:text-2xl       font-bold text-slate-800">
                   Admin Dashboard

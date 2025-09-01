@@ -400,7 +400,7 @@ h3 {
   font-family: "Source Code Pro", sans-serif;
   font-size: 47px;
   font-weight: bold;
-  letter-spacing: 9.4px;
+  /* letter-spacing: 9.4px; */
   margin: 0 0 15px;
 }
 
@@ -500,7 +500,6 @@ h3 {
   font-family: "Source Code Pro", sans-serif;
   font-size: 47px;
   font-weight: bold;
-  letter-spacing: 9.4px;
   margin: 0 0 15px;
 }
 

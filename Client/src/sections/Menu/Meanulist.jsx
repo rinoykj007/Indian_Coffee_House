@@ -6,19 +6,7 @@ import HeaderSection from "./components/HeaderSection";
 import MenuItemCard from "./components/MenuItemCard";
 
 export default function Meanulist() {
-  // Complete order handler
-  const completeOrder = () => {
-    alert("Order completed!");
-    setCart([]);
-    setShowOrderPopup(false);
-  };
-  // Cart total calculatio
-  const getCartTotal = () => {
-    return cart.reduce(
-      (sum, item) => sum + item.price * (item.quantity || 1),
-      0
-    );
-  };
+  // State management
   const [filter, setFilter] = useState("");
   const [showOrderPopup, setShowOrderPopup] = useState(false);
   const [menu, setMenu] = useState([]);
@@ -28,6 +16,22 @@ export default function Meanulist() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20); // Show 20 items per page
 
+  // Complete order handler
+  const completeOrder = () => {
+    alert("Order completed!");
+    setCart([]);
+    setShowOrderPopup(false);
+  };
+
+  // Cart total calculation
+  const getCartTotal = () => {
+    return cart.reduce(
+      (sum, item) => sum + item.price * (item.quantity || 1),
+      0
+    );
+  };
+
+  // Add to cart function
   const addToCart = (item) => {
     setCart((prev) =>
       prev.some((i) => i._id === item._id || i.id === item.id)
@@ -49,6 +53,7 @@ export default function Meanulist() {
     );
   };
 
+  // Fetch menu items from the API
   useEffect(() => {
     console.log(
       "Fetching menu from:",
@@ -89,6 +94,7 @@ export default function Meanulist() {
       });
   }, []);
 
+  // Loading and error states
   if (loading)
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center">
@@ -101,6 +107,7 @@ export default function Meanulist() {
         </div>
       </div>
     );
+
   if (error) return <div>{error}</div>;
 
   // Get unique categories/types for filter dropdown
@@ -112,6 +119,10 @@ export default function Meanulist() {
   const filteredMenu = filter
     ? menu.filter((item) => (item.category || item.type) === filter)
     : menu;
+
+  // Debug logs to help diagnose filtering issues
+  console.log("Filter value:", filter);
+  console.log("Filtered menu:", filteredMenu);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-orange-50 flex flex-col items-center py-10 px-2">
@@ -135,11 +146,17 @@ export default function Meanulist() {
           ))}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 px-4">
-          {filteredMenu.map((item) => (
-            <div key={item._id || item.id} className="flex justify-center">
-              <MenuItemCard item={item} addToCart={addToCart} />
+          {filteredMenu.length === 0 ? (
+            <div className="text-center text-slate-500 py-8 col-span-full">
+              No menu items found in this category.
             </div>
-          ))}
+          ) : (
+            filteredMenu.map((item) => (
+              <div key={item._id || item.id} className="flex justify-center">
+                <MenuItemCard item={item} addToCart={addToCart} />
+              </div>
+            ))
+          )}
         </div>
         {/* Floating Cart Button */}
         <FloatingCartButton cart={cart} setShowOrderPopup={setShowOrderPopup} />

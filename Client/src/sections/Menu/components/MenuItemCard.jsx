@@ -31,9 +31,16 @@ const MenuItemCard = ({ item, index, addToCart }) => {
           <h3 className="text-lg font-semibold text-gray-800 mb-1">
             {item.name}
           </h3>
-          <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded mb-2">
-            {item.type}
-          </span>
+          <div className="flex flex-wrap gap-1 mb-2">
+            <span className="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded">
+              {item.type}
+            </span>
+            {item.category && item.category !== item.type && (
+              <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
+                {item.category}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -52,9 +59,19 @@ const MenuItemCard = ({ item, index, addToCart }) => {
           </span>
           <div className="flex items-center space-x-1">
             {[...Array(5)].map((_, i) => (
-              <i key={i} className="fas fa-star text-amber-400 text-xs"></i>
+              <i
+                key={i}
+                className={`fas fa-star ${
+                  i < Math.floor(item.rating || 4.5)
+                    ? "text-amber-400"
+                    : "text-gray-300"
+                } text-xs`}
+              ></i>
             ))}
-            <span className="text-xs text-gray-500 ml-1">(4.8)</span>
+            <span className="text-xs text-gray-500 ml-1">
+              ({item.rating || 4.5}){" "}
+              {item.reviewCount ? `(${item.reviewCount})` : ""}
+            </span>
           </div>
         </div>
 

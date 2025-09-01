@@ -34,14 +34,19 @@ const Table = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("All pending bills fetched in one request:", data);
+        console.log(
+          "All pending bills fetched in one request:",
+          JSON.stringify(data)
+        );
 
         if (data.success && data.bills) {
+          console.log("Processing bills:", data.bills.length);
           setPendingBills(data.bills);
 
           // Update table statuses to match the pending bills
           updateTablesBasedOnBills(data.bills);
         } else {
+          console.log("No bills found or invalid response format");
           setPendingBills([]);
         }
       } else {
@@ -92,13 +97,35 @@ const Table = () => {
   };
 
   const updateTablesBasedOnBills = async (bills) => {
+    console.log("Updating tables based on bills:", bills);
+
+    // Log tables data
+    console.log(
+      "Current tables:",
+      tables.map((t) => ({
+        id: t._id || t.id,
+        number: t.tableNumber,
+        status: t.status,
+      }))
+    );
+
     // Update table statuses to match pending bills
     for (const bill of bills) {
+      console.log("Processing bill for table:", bill.tableId);
       const table = tables.find(
         (t) => String(t._id || t.id) === String(bill.tableId)
       );
-      if (table && table.status === "available") {
-        await updateTableStatus(bill.tableId, "occupied");
+
+      if (table) {
+        console.log(
+          `Found table ${table.tableNumber}, current status: ${table.status}`
+        );
+        if (table.status === "available") {
+          console.log(`Updating table ${table.tableNumber} status to occupied`);
+          await updateTableStatus(bill.tableId, "occupied");
+        }
+      } else {
+        console.log(`Table not found for bill with tableId: ${bill.tableId}`);
       }
     }
   };
@@ -293,9 +320,9 @@ const Table = () => {
 
           {/* Tables Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {tables.map((table) => (
+            {tables.map((table, index) => (
               <div
-                key={table.id}
+                key={table._id || table.id || index}
                 onClick={() => selectTable(table)}
                 className={`
                   bg-white rounded-lg shadow p-4 cursor-pointer transition-all hover:shadow-lg
@@ -387,7 +414,7 @@ const Table = () => {
                         {bill.items &&
                           bill.items.map((item, index) => (
                             <div
-                              key={index}
+                              key={item.id || item._id || index}
                               className="flex justify-between items-center text-sm"
                             >
                               <div className="flex-1">

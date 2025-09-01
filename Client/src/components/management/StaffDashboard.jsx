@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Table, Clock, CheckCircle, Coffee, LogOut, Users } from "lucide-react";
+import logo from "./logo.png";
 
 const StaffDashboard = () => {
   const { user, logout, makeAuthenticatedRequest } = useAuth();
@@ -114,9 +115,7 @@ const StaffDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="bg-amber-600 p-2 rounded-lg">
-                <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              <img src={logo} alt="" className="w-5 h-5" />
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-slate-800">
                   Staff Dashboard

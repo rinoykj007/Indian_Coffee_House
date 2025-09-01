@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import logo from "./logo.png";
 import {
   ArrowLeft,
   ShoppingCart,
@@ -73,7 +74,10 @@ const MenuPage = () => {
 
       // Handle both old format (array) and new format (object with menuItems)
       const menuItemsArray = Array.isArray(data) ? data : data.menuItems || [];
-      setMenuItems(menuItemsArray.filter((item) => item.isAvailable));
+
+      // Since isAvailable field doesn't exist in the Menu schema, we don't filter by it
+      console.log("Fetched menu items:", menuItemsArray);
+      setMenuItems(menuItemsArray);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     } finally {
@@ -317,17 +321,11 @@ const MenuPage = () => {
               </button>
               <div className="h-6 w-px bg-slate-300"></div>
               <div className="flex items-center space-x-3">
-                <div className="bg-amber-600 p-2 rounded-lg">
-                  <Coffee className="w-5 h-5 text-white" />
-                </div>
+                <img src={logo} alt="" className="w-5 h-5" />
                 <div>
                   <h1 className="text-xl font-bold text-slate-800">
                     Table {tableInfo.tableNumber}
                   </h1>
-                  <p className="text-sm text-slate-600">
-                    <Users className="w-4 h-4 inline mr-1" />
-                    {tableInfo.capacity} guests • {tableInfo.location}
-                  </p>
                 </div>
               </div>
             </div>
