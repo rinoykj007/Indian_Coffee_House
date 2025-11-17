@@ -9,6 +9,8 @@ import {
   Minus,
   Coffee,
   Users,
+  Search,
+  X,
 } from "lucide-react";
 
 const MenuPage = () => {
@@ -19,6 +21,7 @@ const MenuPage = () => {
 
   const [menuItems, setMenuItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [orderItems, setOrderItems] = useState([]);
   const [orderTotal, setOrderTotal] = useState(0);
   const [existingOrder, setExistingOrder] = useState(null);
@@ -353,6 +356,28 @@ const MenuPage = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search menu items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-3 border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Category Filter */}
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
@@ -385,10 +410,19 @@ const MenuPage = () => {
         {/* Menu Items Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {menuItems
-            .filter(
-              (item) =>
-                selectedCategory === "all" || item.category === selectedCategory
-            )
+            .filter((item) => {
+              // Category filter
+              const matchesCategory =
+                selectedCategory === "all" || item.category === selectedCategory;
+
+              // Search filter
+              const matchesSearch =
+                searchQuery.trim() === "" ||
+                item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+
+              return matchesCategory && matchesSearch;
+            })
             .map((item) => {
               const orderItem = orderItems.find(
                 (orderItem) => orderItem._id === item._id
@@ -457,17 +491,22 @@ const MenuPage = () => {
             })}
         </div>
 
-        {menuItems.filter(
-          (item) =>
-            selectedCategory === "all" || item.category === selectedCategory
-        ).length === 0 && (
+        {menuItems.filter((item) => {
+          const matchesCategory =
+            selectedCategory === "all" || item.category === selectedCategory;
+          const matchesSearch =
+            searchQuery.trim() === "" ||
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+          return matchesCategory && matchesSearch;
+        }).length === 0 && (
           <div className="text-center py-12">
             <Coffee className="w-16 h-16 text-slate-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-800 mb-2">
-              No items available
+              No items found
             </h3>
             <p className="text-slate-600">
-              No menu items found in this category.
+              {searchQuery ? `No menu items match "${searchQuery}"` : "No menu items found in this category."}
             </p>
           </div>
         )}

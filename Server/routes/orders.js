@@ -268,6 +268,176 @@ router.post("/", async (req, res) => {
   }
 });
 
+// POST /api/orders/:orderId/reduce-item - Reduce quantity of a specific item by 1
+router.post("/:orderId/reduce-item", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { itemIndex } = req.body;
+
+    console.log(`Reducing quantity for item at index ${itemIndex} in order ${orderId}`);
+
+    // Validate inputs
+    if (itemIndex === undefined || itemIndex === null) {
+      return res.status(400).json({
+        success: false,
+        error: "Item index is required",
+      });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order not found",
+      });
+    }
+
+    // Check if item index is valid
+    if (itemIndex < 0 || itemIndex >= order.items.length) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid item index",
+      });
+    }
+
+    // Get the item
+    const item = order.items[itemIndex];
+    console.log(`Current quantity: ${item.quantity} for ${item.name}`);
+
+    // Reduce quantity by 1
+    item.quantity -= 1;
+
+    // If quantity reaches 0, remove the item
+    if (item.quantity <= 0) {
+      console.log(`Quantity is 0, removing item: ${item.name}`);
+      order.items.splice(itemIndex, 1);
+    }
+
+    // If no items left, delete the entire order
+    if (order.items.length === 0) {
+      console.log("No items left in order, deleting order");
+      await Order.findByIdAndDelete(orderId);
+
+      return res.json({
+        success: true,
+        message: "Item removed. Order deleted as no items remain.",
+        orderDeleted: true,
+      });
+    }
+
+    // Recalculate total
+    const newTotal = order.items.reduce(
+      (sum, orderItem) => sum + parseFloat(orderItem.price) * parseInt(orderItem.quantity),
+      0
+    );
+
+    order.total = newTotal;
+    order.updatedAt = new Date();
+
+    // Save the updated order
+    await order.save();
+
+    console.log(`Item quantity reduced successfully. New total: €${newTotal}`);
+
+    return res.json({
+      success: true,
+      message: "Item quantity reduced successfully",
+      order: order,
+      orderDeleted: false,
+    });
+  } catch (error) {
+    console.error("Error reducing item quantity:", error);
+    return res.status(500).json({
+      success: false,
+      error: `Failed to reduce item quantity: ${error.message}`,
+    });
+  }
+});
+
+// POST /api/orders/:orderId/cancel-item - Cancel a specific item from an order
+router.post("/:orderId/cancel-item", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { itemIndex } = req.body;
+
+    console.log(`Cancelling item at index ${itemIndex} from order ${orderId}`);
+
+    // Validate inputs
+    if (itemIndex === undefined || itemIndex === null) {
+      return res.status(400).json({
+        success: false,
+        error: "Item index is required",
+      });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order not found",
+      });
+    }
+
+    // Check if item index is valid
+    if (itemIndex < 0 || itemIndex >= order.items.length) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid item index",
+      });
+    }
+
+    // Get the item being cancelled for logging
+    const cancelledItem = order.items[itemIndex];
+    console.log(`Cancelling item: ${cancelledItem.name} x${cancelledItem.quantity}`);
+
+    // Remove the item from the order
+    order.items.splice(itemIndex, 1);
+
+    // If no items left, delete the entire order and update table status
+    if (order.items.length === 0) {
+      console.log("No items left in order, deleting order");
+      await Order.findByIdAndDelete(orderId);
+
+      return res.json({
+        success: true,
+        message: "Item cancelled. Order deleted as no items remain.",
+        orderDeleted: true,
+      });
+    }
+
+    // Recalculate total
+    const newTotal = order.items.reduce(
+      (sum, item) => sum + parseFloat(item.price) * parseInt(item.quantity),
+      0
+    );
+
+    order.total = newTotal;
+    order.updatedAt = new Date();
+
+    // Save the updated order
+    await order.save();
+
+    console.log(`Item cancelled successfully. New total: €${newTotal}`);
+
+    return res.json({
+      success: true,
+      message: "Item cancelled successfully",
+      order: order,
+      orderDeleted: false,
+    });
+  } catch (error) {
+    console.error("Error cancelling item:", error);
+    return res.status(500).json({
+      success: false,
+      error: `Failed to cancel item: ${error.message}`,
+    });
+  }
+});
+
 // GET /api/orders - Get all orders
 router.get("/", (req, res) => {
   try {

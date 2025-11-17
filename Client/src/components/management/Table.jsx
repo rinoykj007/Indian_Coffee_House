@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Coffee, Users, LogOut } from "lucide-react";
+import { Coffee, Users, LogOut, Trash2, Minus } from "lucide-react";
 
 const Table = () => {
   const { user, logout, makeAuthenticatedRequest } = useAuth();
@@ -230,6 +230,79 @@ const Table = () => {
     }
   };
 
+  const reduceItemQuantity = async (bill, itemIndex) => {
+    const item = bill.items[itemIndex];
+
+    try {
+      const response = await makeAuthenticatedRequest(
+        `/orders/${bill.orderId}/reduce-item`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            itemIndex: itemIndex,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Refresh pending bills to show updated order
+        await fetchPendingBills();
+
+        // Show message if order was deleted (last item removed)
+        if (data.orderDeleted) {
+          alert("Last item removed. Order has been cancelled.");
+        }
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to reduce item: ${errorData.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error reducing item quantity:", error);
+      alert("Error reducing item quantity. Please try again.");
+    }
+  };
+
+  const cancelItem = async (bill, itemIndex) => {
+    const item = bill.items[itemIndex];
+
+    // Confirm cancellation
+    const confirmCancel = window.confirm(
+      `Cancel all ${item.quantity}x ${item.name} (€${(item.price * item.quantity).toFixed(2)})?`
+    );
+
+    if (!confirmCancel) return;
+
+    try {
+      const response = await makeAuthenticatedRequest(
+        `/orders/${bill.orderId}/cancel-item`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            itemIndex: itemIndex,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message || "Item cancelled successfully");
+
+        // Refresh pending bills to show updated order
+        await fetchPendingBills();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to cancel item: ${errorData.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error cancelling item:", error);
+      alert("Error cancelling item. Please try again.");
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/management/login");
@@ -425,8 +498,26 @@ const Table = () => {
                                   × {item.quantity}
                                 </span>
                               </div>
-                              <div className="text-slate-800 font-medium">
-                                €{(item.price * item.quantity).toFixed(0)}
+                              <div className="flex items-center space-x-2">
+                                <div className="text-slate-800 font-medium">
+                                  €{(item.price * item.quantity).toFixed(2)}
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <button
+                                    onClick={() => reduceItemQuantity(bill, index)}
+                                    className="text-orange-500 hover:text-orange-700 hover:bg-orange-50 p-1 rounded transition-colors"
+                                    title="Reduce quantity by 1"
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => cancelItem(bill, index)}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+                                    title="Cancel all of this item"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           ))}
