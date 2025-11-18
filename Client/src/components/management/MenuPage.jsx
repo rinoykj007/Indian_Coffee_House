@@ -413,13 +413,17 @@ const MenuPage = () => {
             .filter((item) => {
               // Category filter
               const matchesCategory =
-                selectedCategory === "all" || item.category === selectedCategory;
+                selectedCategory === "all" ||
+                item.category === selectedCategory;
 
               // Search filter
               const matchesSearch =
                 searchQuery.trim() === "" ||
                 item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+                (item.description &&
+                  item.description
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase()));
 
               return matchesCategory && matchesSearch;
             })
@@ -435,7 +439,7 @@ const MenuPage = () => {
                   className="bg-white rounded-xl shadow-lg border border-amber-100 overflow-hidden hover:shadow-xl transition-shadow"
                 >
                   {/* Item Image */}
-                  {item.image && (
+                  {/* {item.image && (
                     <div className="h-48 overflow-hidden">
                       <img
                         src={item.image}
@@ -444,7 +448,7 @@ const MenuPage = () => {
                         loading="lazy"
                       />
                     </div>
-                  )}
+                  )} */}
 
                   <div className="p-6">
                     <div className="flex justify-between items-center mb-3">
@@ -497,7 +501,10 @@ const MenuPage = () => {
           const matchesSearch =
             searchQuery.trim() === "" ||
             item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+            (item.description &&
+              item.description
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()));
           return matchesCategory && matchesSearch;
         }).length === 0 && (
           <div className="text-center py-12">
@@ -506,7 +513,9 @@ const MenuPage = () => {
               No items found
             </h3>
             <p className="text-slate-600">
-              {searchQuery ? `No menu items match "${searchQuery}"` : "No menu items found in this category."}
+              {searchQuery
+                ? `No menu items match "${searchQuery}"`
+                : "No menu items found in this category."}
             </p>
           </div>
         )}
