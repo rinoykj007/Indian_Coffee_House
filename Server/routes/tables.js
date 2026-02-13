@@ -1,9 +1,11 @@
 const express = require("express");
 const Table = require("../models/Table");
+const { authenticate } = require("../middleware/auth");
+const { tableStatusValidator, tableIdValidator } = require("../middleware/validators");
 const router = express.Router();
 
-// GET /api/tables - Get all tables from MongoDB
-router.get("/", async (req, res) => {
+// GET /api/tables - Get all tables from MongoDB (authenticated staff)
+router.get("/", authenticate, async (req, res) => {
   try {
     const tables = await Table.find({});
     res.json({ tables });
@@ -16,8 +18,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/tables/summary/availability - Get table availability summary for admin dashboard
-router.get("/summary/availability", async (req, res) => {
+// GET /api/tables/summary/availability - Get table availability summary for admin dashboard (authenticated staff)
+router.get("/summary/availability", authenticate, async (req, res) => {
   try {
     const totalTables = await Table.countDocuments({});
     const availableTables = await Table.countDocuments({ status: "available" });
@@ -37,8 +39,8 @@ router.get("/summary/availability", async (req, res) => {
   }
 });
 
-// PUT /api/tables/:id/status - Update table status
-router.put("/:id/status", async (req, res) => {
+// PUT /api/tables/:id/status - Update table status (authenticated staff)
+router.put("/:id/status", authenticate, tableIdValidator, tableStatusValidator, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

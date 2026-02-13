@@ -1,8 +1,10 @@
 const express = require("express");
 const Menu = require("../models/Menu");
+const { authenticate, authorize } = require("../middleware/auth");
+const { menuItemValidator, menuIdValidator } = require("../middleware/validators");
 const router = express.Router();
 
-// GET /api/menu - Get all menu items from MongoDB Cloud
+// GET /api/menu - Get all menu items from MongoDB Cloud (public access)
 router.get("/", async (req, res) => {
   try {
     const menuItems = await Menu.find({});
@@ -16,8 +18,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/menu/stats/summary - Get menu statistics for admin dashboard
-router.get("/stats/summary", async (req, res) => {
+// GET /api/menu/stats/summary - Get menu statistics for admin dashboard (admin only)
+router.get("/stats/summary", authenticate, authorize("admin"), async (req, res) => {
   try {
     const totalMenuItems = await Menu.countDocuments({});
     const availableItems = await Menu.countDocuments({ isAvailable: true });
@@ -38,7 +40,7 @@ router.get("/stats/summary", async (req, res) => {
 });
 
 // POST /api/menu - Add new menu item (admin only)
-router.post("/", async (req, res) => {
+router.post("/", authenticate, authorize("admin"), menuItemValidator, async (req, res) => {
   try {
     const {
       id,
@@ -52,39 +54,21 @@ router.post("/", async (req, res) => {
       category,
     } = req.body;
 
-    if (
-      !id ||
-      !name ||
-      !type ||
-      !image ||
-      !price ||
-      !rating ||
-      !reviewCount ||
-      !description ||
-      !category
-    ) {
-      return res.status(400).json({
-        success: false,
-        error:
-          "All fields (id, name, type, image, price, rating, reviewCount, description, category) are required",
-      });
-    }
-
     const newMenuItem = new Menu({
       id,
       name,
       type,
       image,
       price: parseFloat(price),
-      rating: parseFloat(rating),
-      reviewCount: parseInt(reviewCount),
+      rating: rating ? parseFloat(rating) : 0,
+      reviewCount: reviewCount ? parseInt(reviewCount) : 0,
       description,
       category,
     });
 
     await newMenuItem.save();
 
-    res.json({
+    res.status(201).json({
       success: true,
       message: "Menu item added successfully",
       menuItem: newMenuItem,
@@ -99,7 +83,7 @@ router.post("/", async (req, res) => {
 });
 
 // PUT /api/menu/:id - Update a menu item (admin only)
-router.put("/:id", async (req, res) => {
+router.put("/:id", authenticate, authorize("admin"), menuIdValidator, async (req, res) => {
   try {
     const {
       name,
@@ -151,7 +135,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE /api/menu/:id - Delete a menu item (admin only)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, authorize("admin"), menuIdValidator, async (req, res) => {
   try {
     const menuItem = await Menu.findByIdAndDelete(req.params.id);
 

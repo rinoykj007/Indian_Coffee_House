@@ -1,13 +1,11 @@
 const express = require("express");
 const Order = require("../../Server/models/Order");
+const { authenticate, authorize } = require("../middleware/auth");
+const { orderValidator, orderIdValidator, reduceItemValidator } = require("../middleware/validators");
 const router = express.Router();
 
-// Simple in-memory orders storage for testing
-let orders = [];
-let orderIdCounter = 1;
-
-// GET /api/orders - Get all orders for admin dashboard
-router.get("/", async (req, res) => {
+// GET /api/orders - Get all orders for admin dashboard (authenticated staff)
+router.get("/", authenticate, async (req, res) => {
   try {
     const orders = await Order.find({}).sort({ createdAt: -1 }).limit(20);
     res.json({
@@ -23,8 +21,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/orders/stats/summary - Get order statistics for admin dashboard
-router.get("/stats/summary", async (req, res) => {
+// GET /api/orders/stats/summary - Get order statistics for admin dashboard (authenticated staff)
+router.get("/stats/summary", authenticate, async (req, res) => {
   try {
     const activeOrders = await Order.countDocuments({ status: "pending" });
     const completedOrders = await Order.countDocuments({ status: "completed" });
@@ -44,8 +42,8 @@ router.get("/stats/summary", async (req, res) => {
   }
 });
 
-// GET /api/orders/table/:tableId - Get existing order for a table
-router.get("/table/:tableId", async (req, res) => {
+// GET /api/orders/table/:tableId - Get existing order for a table (authenticated staff)
+router.get("/table/:tableId", authenticate, async (req, res) => {
   try {
     const { tableId } = req.params;
 
@@ -68,8 +66,8 @@ router.get("/table/:tableId", async (req, res) => {
   }
 });
 
-// POST /api/orders - Create or update order using MongoDB
-router.post("/", async (req, res) => {
+// POST /api/orders - Create or update order using MongoDB (authenticated staff)
+router.post("/", authenticate, async (req, res) => {
   try {
     console.log(
       "Order API called with data:",
@@ -268,8 +266,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// POST /api/orders/:orderId/reduce-item - Reduce quantity of a specific item by 1
-router.post("/:orderId/reduce-item", async (req, res) => {
+// POST /api/orders/:orderId/reduce-item - Reduce quantity of a specific item by 1 (authenticated staff)
+router.post("/:orderId/reduce-item", authenticate, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { itemIndex } = req.body;
@@ -356,8 +354,8 @@ router.post("/:orderId/reduce-item", async (req, res) => {
   }
 });
 
-// POST /api/orders/:orderId/cancel-item - Cancel a specific item from an order
-router.post("/:orderId/cancel-item", async (req, res) => {
+// POST /api/orders/:orderId/cancel-item - Cancel a specific item from an order (authenticated staff)
+router.post("/:orderId/cancel-item", authenticate, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { itemIndex } = req.body;
@@ -434,22 +432,6 @@ router.post("/:orderId/cancel-item", async (req, res) => {
     return res.status(500).json({
       success: false,
       error: `Failed to cancel item: ${error.message}`,
-    });
-  }
-});
-
-// GET /api/orders - Get all orders
-router.get("/", (req, res) => {
-  try {
-    res.json({
-      success: true,
-      orders,
-    });
-  } catch (error) {
-    console.error("Orders fetch error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch orders",
     });
   }
 });

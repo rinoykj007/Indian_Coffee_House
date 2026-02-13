@@ -2,10 +2,12 @@ const express = require("express");
 const Payment = require("../models/Payment");
 const Order = require("../models/Order");
 const Table = require("../models/Table");
+const { authenticate, authorize } = require("../middleware/auth");
+const { paymentValidator } = require("../middleware/validators");
 const router = express.Router();
 
-// GET /api/payments/reports/daily - Get daily revenue report for admin dashboard
-router.get("/reports/daily", async (req, res) => {
+// GET /api/payments/reports/daily - Get daily revenue report for admin dashboard (authenticated staff)
+router.get("/reports/daily", authenticate, async (req, res) => {
   try {
     const today = new Date();
     const startOfDay = new Date(
@@ -46,8 +48,8 @@ router.get("/reports/daily", async (req, res) => {
   }
 });
 
-// GET /api/payments/table/:tableId/bill - Generate bill for a table
-router.get("/table/:tableId/bill", async (req, res) => {
+// GET /api/payments/table/:tableId/bill - Generate bill for a table (authenticated staff)
+router.get("/table/:tableId/bill", authenticate, async (req, res) => {
   try {
     const { tableId } = req.params;
 
@@ -100,8 +102,8 @@ router.get("/table/:tableId/bill", async (req, res) => {
   }
 });
 
-// POST /api/payments/process - Process payment for an order
-router.post("/process", async (req, res) => {
+// POST /api/payments/process - Process payment for an order (authenticated staff)
+router.post("/process", authenticate, paymentValidator, async (req, res) => {
   try {
     const {
       orderId,
@@ -120,10 +122,11 @@ router.post("/process", async (req, res) => {
       staffId,
     });
 
-    if (!orderId || !tableId || !paymentMethod) {
+    // Validate discount
+    if (discount < 0 || discount > subtotal) {
       return res.status(400).json({
         success: false,
-        error: "Order ID, Table ID, and Payment Method are required",
+        error: "Invalid discount amount",
       });
     }
 
@@ -175,7 +178,7 @@ router.post("/process", async (req, res) => {
       totalAmount: totalAmount,
       paymentMethod: paymentMethod,
       paymentStatus: "completed",
-      staffId: staffId,
+      staffId: req.user._id, // Use authenticated user's ID
       notes: notes,
     });
 
@@ -218,8 +221,8 @@ router.post("/process", async (req, res) => {
   }
 });
 
-// GET /api/payments/table/:tableId - Get payment history for a table
-router.get("/table/:tableId", async (req, res) => {
+// GET /api/payments/table/:tableId - Get payment history for a table (authenticated staff)
+router.get("/table/:tableId", authenticate, async (req, res) => {
   try {
     const { tableId } = req.params;
 
@@ -240,8 +243,8 @@ router.get("/table/:tableId", async (req, res) => {
   }
 });
 
-// GET /api/payments/daily - Get daily payment summary
-router.get("/daily", async (req, res) => {
+// GET /api/payments/daily - Get daily payment summary (authenticated staff)
+router.get("/daily", authenticate, async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -292,8 +295,8 @@ router.get("/daily", async (req, res) => {
   }
 });
 
-// GET /api/payments/pending-bills - Get all pending bills at once
-router.get("/pending-bills", async (req, res) => {
+// GET /api/payments/pending-bills - Get all pending bills at once (authenticated staff)
+router.get("/pending-bills", authenticate, async (req, res) => {
   try {
     // Find all pending orders
     const pendingOrders = await Order.find({

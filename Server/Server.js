@@ -2,6 +2,9 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const mongoSanitize = require("express-mongo-sanitize");
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -9,39 +12,79 @@ const tableRoutes = require("./routes/tables");
 const orderRoutes = require("./routes/orders");
 const menuRoutes = require("./routes/menu");
 const paymentRoutes = require("./routes/payments");
-// const paymentRoutes = require("./routes/payments");
 
 const app = express();
 
-// Middleware
+// Security Middleware
+// Helmet - Set security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per windowMs
+  message: "Too many login attempts, please try again later.",
+  skipSuccessfulRequests: true,
+});
+
+// Apply rate limiting to all routes
+app.use("/api/", limiter);
+app.use("/api/auth/login", authLimiter);
+
+// NoSQL injection protection
+app.use(mongoSanitize());
+
+// CORS Configuration
 const allowedOrigins = [
-  "https://indian-coffee-house-v5l9jy13d-rinoykj007s-projects.vercel.app",
   "https://indian-coffee-house-hxyp.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:5174",
   "https://indian-coffee-house-i6c5.vercel.app",
   "https://www.payasam.ie",
+  ...(process.env.NODE_ENV === "development"
+    ? ["http://localhost:5173", "http://localhost:5174"]
+    : []),
 ];
 
-// Configure CORS options
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
 
-// Apply CORS middleware before routes
 app.use(cors(corsOptions));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
 
-// Additional CORS debugging middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} - Origin: ${req.get("Origin")}`);
-  next();
-});
+// Body parsing middleware with size limits
+app.use(express.json({ limit: "1mb" })); // Reduced from 10mb
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 const PORT = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
