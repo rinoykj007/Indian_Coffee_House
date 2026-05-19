@@ -27,7 +27,7 @@ export default function Meanulist() {
   const getCartTotal = () => {
     return cart.reduce(
       (sum, item) => sum + item.price * (item.quantity || 1),
-      0
+      0,
     );
   };
 
@@ -38,9 +38,9 @@ export default function Meanulist() {
         ? prev.map((i) =>
             i._id === item._id || i.id === item.id
               ? { ...i, quantity: (i.quantity || 1) + 1 }
-              : i
+              : i,
           )
-        : [...prev, { ...item, quantity: 1 }]
+        : [...prev, { ...item, quantity: 1 }],
     );
   };
 
@@ -48,24 +48,18 @@ export default function Meanulist() {
   const updateQuantity = (index, newQty) => {
     setCart((prev) =>
       prev.map((item, i) =>
-        i === index ? { ...item, quantity: newQty } : item
-      )
+        i === index ? { ...item, quantity: newQty } : item,
+      ),
     );
   };
 
   // Fetch menu items from the API
   useEffect(() => {
-    console.log(
-      "Fetching menu from:",
-      `${import.meta.env.VITE_API_URL}/api/menu`
-    );
-
     axios
       .get(`${import.meta.env.VITE_API_URL}/api/menu`, {
         timeout: 30000, // 30 second timeout
       })
       .then((res) => {
-        console.log("Menu data from backend:", res.data);
         let menuData = res.data.menuItems || res.data;
         if (!Array.isArray(menuData)) {
           menuData = [menuData];
@@ -77,15 +71,15 @@ export default function Meanulist() {
         console.error("Menu fetch error:", err);
         if (err.code === "ECONNABORTED") {
           setError(
-            "Menu loading timeout - server might be starting up, please wait and try again"
+            "Menu loading timeout - server might be starting up, please wait and try again",
           );
         } else if (err.response) {
           setError(
-            `Server error: ${err.response.status} - ${err.response.statusText}`
+            `Server error: ${err.response.status} - ${err.response.statusText}`,
           );
         } else if (err.request) {
           setError(
-            "Cannot connect to server - please check your connection or try again later"
+            "Cannot connect to server - please check your connection or try again later",
           );
         } else {
           setError(`Failed to fetch menu: ${err.message}`);
@@ -112,17 +106,13 @@ export default function Meanulist() {
 
   // Get unique categories/types for filter dropdown
   const categories = Array.from(
-    new Set(menu.map((item) => item.category || item.type || "Other"))
+    new Set(menu.map((item) => item.category || item.type || "Other")),
   );
 
   // Filtered menu
   const filteredMenu = filter
     ? menu.filter((item) => (item.category || item.type) === filter)
     : menu;
-
-  // Debug logs to help diagnose filtering issues
-  console.log("Filter value:", filter);
-  console.log("Filtered menu:", filteredMenu);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-orange-50 flex flex-col items-center py-10 px-2">

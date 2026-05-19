@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function About() {
+  const navigate = useNavigate();
   return (
     <section className="py-20 bg-gradient-to-br from-gray-50 to-white min-h-screen flex items-center">
       <div className="max-w-6xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-2 gap-15 lg:gap-20 items-center">
@@ -52,12 +54,12 @@ export default function About() {
                   Visit Us Today
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-600 transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a
-                  href="#menu"
+                <button
+                  onClick={() => navigate("/MenuList")}
                   className="inline-block bg-gradient-to-r from-amber-600 to-amber-700 text-white px-8 py-2 rounded-full font-semibold text-base transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-600/30 w-full sm:w-auto text-center max-w-xs"
                 >
                   Explore Our Menu
-                </a>
+                </button>
               </div>
             </div>
           </div>

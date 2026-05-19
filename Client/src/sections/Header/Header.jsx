@@ -20,7 +20,7 @@ export default function Header({ headerRef, aboutRef, navItems }) {
     const onScroll = () => {
       const y = window.pageYOffset;
       setNavActive(
-        headerRef.current && y > headerRef.current.offsetHeight - 75
+        headerRef.current && y > headerRef.current.offsetHeight - 75,
       );
     };
 
@@ -74,8 +74,8 @@ export default function Header({ headerRef, aboutRef, navItems }) {
                     navActiveIndex === idx
                       ? "bg-yellow-500 text-white shadow-md"
                       : navActive
-                      ? "text-black hover:text-yellow-600 hover:bg-yellow-100"
-                      : "text-white hover:text-yellow-400 hover:bg-yellow-900/30"
+                        ? "text-black hover:text-yellow-600 hover:bg-yellow-100"
+                        : "text-white hover:text-yellow-400 hover:bg-yellow-900/30"
                   }`}
                   onClick={(e) => {
                     e.preventDefault();
@@ -174,7 +174,10 @@ export default function Header({ headerRef, aboutRef, navItems }) {
                 Enjoy the best food with us...
               </span>
             </p>
-            <button className="mt-6 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-yellow-500 hover:to-amber-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full w-max flex items-center gap-2 transform hover:scale-105 transition-all duration-300 shadow-lg animate-pulse-subtle">
+            <button
+              onClick={() => navigate("/MenuList")}
+              className="mt-6 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-yellow-500 hover:to-amber-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full w-max flex items-center gap-2 transform hover:scale-105 transition-all duration-300 shadow-lg animate-pulse-subtle"
+            >
               <span className="font-medium text-sm sm:text-base">
                 Order Now
               </span>
