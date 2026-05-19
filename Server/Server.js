@@ -59,6 +59,7 @@ const allowedOrigins = [
   "https://indian-coffee-house-hxyp.vercel.app",
   "https://indian-coffee-house-i6c5.vercel.app",
   "https://www.payasam.ie",
+  "https://payasam.ie",
   ...(process.env.NODE_ENV === "development"
     ? ["http://localhost:5173", "http://localhost:5174"]
     : []),
