@@ -8,6 +8,14 @@
   html {
     font-family: system-ui, sans-serif;
   }
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  input, textarea {
+    user-select: auto;
+    -webkit-user-select: auto;
+  }
   .font-oxanium {
     font-family: "Oxanium", sans-serif;
   }
