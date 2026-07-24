@@ -77,21 +77,21 @@ router.get("/table/:tableId/bill", authenticate, async (req, res) => {
     const billData = {
       orderId: order._id,
       orderNumber: order.orderNumber,
-      tableId: order.tableId._id,
-      tableNumber: order.tableId.tableNumber,
-      items: order.items,
+      tableId: order.tableId ? order.tableId._id : order.tableId,
+      tableNumber: order.tableId ? order.tableId.tableNumber : "Unknown",
+      items: order.items || [],
       itemsCount: itemsCount,
       subtotal: subtotal,
       totalAmount: totalAmount,
       createdAt: order.createdAt,
     };
 
-    console.log("Bill generated for table:", order.tableId.tableNumber);
+    console.log("Bill generated for table:", order.tableId ? order.tableId.tableNumber : "Unknown");
 
     res.json({
       success: true,
       bill: billData,
-      message: `Bill generated for Table ${order.tableId.tableNumber}`,
+      message: `Bill generated for Table ${order.tableId ? order.tableId.tableNumber : "Unknown"}`,
     });
   } catch (error) {
     console.error("Error generating bill:", error);
@@ -122,13 +122,6 @@ router.post("/process", authenticate, paymentValidator, async (req, res) => {
       staffId,
     });
 
-    // Validate discount
-    if (discount < 0 || discount > subtotal) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid discount amount",
-      });
-    }
 
     // Find the order
     const order = await Order.findById(orderId).populate(
@@ -166,6 +159,14 @@ router.post("/process", authenticate, paymentValidator, async (req, res) => {
     const subtotal = order.total;
     const totalAmount = subtotal - discount; // No tax
 
+    // Validate discount
+    if (discount < 0 || discount > subtotal) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid discount amount",
+      });
+    }
+
     // Create payment record
     const payment = new Payment({
       orderId: order._id,
@@ -195,13 +196,16 @@ router.post("/process", authenticate, paymentValidator, async (req, res) => {
     await order.save();
     console.log("Order status updated to paid");
 
-    // Update table status to available
-    const updatedTable = await Table.findByIdAndUpdate(
-      tableId,
-      { status: "available" },
-      { new: true }
-    );
-    console.log("Table status updated:", updatedTable);
+    // Update table status to available if the table still exists
+    let updatedTable = null;
+    if (tableId) {
+      updatedTable = await Table.findByIdAndUpdate(
+        tableId,
+        { status: "available" },
+        { new: true }
+      );
+      console.log("Table status updated:", updatedTable);
+    }
 
     res.json({
       success: true,
@@ -312,17 +316,17 @@ router.get("/pending-bills", authenticate, async (req, res) => {
 
     // Convert orders to bills
     const bills = pendingOrders.map((order) => {
-      const itemsCount = order.items.reduce(
-        (sum, item) => sum + item.quantity,
+      const itemsCount = (order.items || []).reduce(
+        (sum, item) => sum + (item.quantity || 0),
         0
       );
 
       return {
         orderId: order._id,
         orderNumber: order.orderNumber,
-        tableId: order.tableId._id,
-        tableNumber: order.tableId.tableNumber,
-        items: order.items,
+        tableId: order.tableId ? order.tableId._id : null,
+        tableNumber: order.tableId ? order.tableId.tableNumber : "Unknown",
+        items: order.items || [],
         itemsCount: itemsCount,
         subtotal: order.total,
         totalAmount: order.total,

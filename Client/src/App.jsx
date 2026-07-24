@@ -8,8 +8,8 @@ import ManagementApp from "./components/management/ManagementApp.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Login from "./components/management/Login.jsx";
-import Table from "./components/management/Table.jsx";
-import Admin from "./components/management/AdminDashboard.jsx";
+import { Table } from "./components/management/table/index.js";
+import Admin from "./components/management/admin-dashboard/screens/AdminDashboard.jsx";
 import Menu from "./components/management/MenuPage.jsx";
 // import Kitchen from "./components/management/Kitchen.jsx";
 
@@ -48,11 +48,11 @@ export default function App() {
             }
           />
 
-          {/* Protected Menu Management - Require Admin Role */}
+          {/* Protected Menu (Order Taking) - Require Authentication */}
           <Route
             path="/management/menu"
             element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute>
                 <Menu />
               </ProtectedRoute>
             }

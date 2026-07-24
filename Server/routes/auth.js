@@ -147,4 +147,55 @@ router.post("/register", authenticate, authorize("admin"), registerValidator, as
   }
 });
 
+// PUT /api/auth/users/:id - Update user details (admin only)
+router.put("/users/:id", authenticate, authorize("admin"), async (req, res) => {
+  try {
+    const { name, username, role, password } = req.body;
+    
+    // Find the user
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found",
+      });
+    }
+
+    // Update fields if provided
+    if (name) user.name = name;
+    if (username) {
+      // Check if new username is already taken by someone else
+      const existingUser = await User.findOne({ username, _id: { $ne: req.params.id } });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          error: "Username already exists",
+        });
+      }
+      user.username = username;
+    }
+    if (role) user.role = role;
+    if (password) user.password = password; // The pre-save hook will hash this
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "User updated successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        name: user.name,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to update user",
+    });
+  }
+});
+
 module.exports = router;

@@ -29,8 +29,6 @@ export default function App() {
   const fixedImageRef = useRef(null);
   const footerRef = useRef(null);
 
-  // Debug log after all state declarations
-  console.log("loading state:", loading);
 
   // Loader fade out effect
   useEffect(() => {

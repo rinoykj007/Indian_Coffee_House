@@ -137,7 +137,7 @@ const reduceItemValidator = [
 // Payment validators
 const paymentValidator = [
   body("orderId").isMongoId().withMessage("Invalid order ID"),
-  body("tableId").isMongoId().withMessage("Invalid table ID"),
+  body("tableId").optional({ nullable: true }).isMongoId().withMessage("Invalid table ID"),
   body("paymentMethod")
     .isIn(["cash", "card", "upi", "online"])
     .withMessage("Invalid payment method"),

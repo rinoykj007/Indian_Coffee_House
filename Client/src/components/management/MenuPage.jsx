@@ -27,6 +27,7 @@ const MenuPage = () => {
   const [existingOrder, setExistingOrder] = useState(null);
   const [isLoadingExistingOrder, setIsLoadingExistingOrder] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Get table info from navigation state
   const tableInfo = location.state?.table || {
@@ -56,11 +57,9 @@ const MenuPage = () => {
         const data = await response.json();
         if (data.order) {
           setExistingOrder(data.order);
-          console.log("Existing order found:", data.order);
         }
       }
     } catch (error) {
-      console.error("Error fetching existing order:", error);
     } finally {
       setIsLoadingExistingOrder(false);
     }
@@ -75,14 +74,10 @@ const MenuPage = () => {
       const response = await makeAuthenticatedRequest("/menu");
       const data = await response.json();
 
-      // Handle both old format (array) and new format (object with menuItems)
       const menuItemsArray = Array.isArray(data) ? data : data.menuItems || [];
 
-      // Since isAvailable field doesn't exist in the Menu schema, we don't filter by it
-      console.log("Fetched menu items:", menuItemsArray);
       setMenuItems(menuItemsArray);
     } catch (error) {
-      console.error("Error fetching menu items:", error);
     } finally {
       setLoading(false);
     }
@@ -131,8 +126,7 @@ const MenuPage = () => {
     setOrderTotal(total);
   };
 
-  // Modify the submitOrder function to handle some common edge cases
-  const submitOrder = async () => {
+  const submitOrder = async (processPaymentImmediately = false) => {
     if (orderItems.length === 0) return;
 
     if (!tableId) {
@@ -141,26 +135,13 @@ const MenuPage = () => {
     }
 
     try {
-      // Add detailed logging to debug the issue
-      console.log("Order items before processing:", orderItems);
-      console.log("Table ID:", tableId);
-      console.log("Location state:", location.state);
-
-      // Define isAdditionalOrder here
       const isAdditionalOrder =
         location.state?.isAdditionalOrder && existingOrder;
 
-      // Make sure the newItems are properly formatted with numeric prices
       const newItems = orderItems.map((item) => {
-        // Ensure we have valid ID, using _id as primary and id as fallback
         const menuItemId = item._id || item.id;
         const price = parseFloat(item.price);
         const quantity = parseInt(item.quantity);
-
-        // Log individual item details for debugging
-        console.log(
-          `Processing item ${item.name}: price=${price}, quantity=${quantity}, id=${menuItemId}`
-        );
 
         return {
           menuItemId: menuItemId,
@@ -171,20 +152,15 @@ const MenuPage = () => {
         };
       });
 
-      // Filter out any items with invalid prices or quantities
       const validItems = newItems.filter(
         (item) => item.price > 0 && item.quantity > 0 && !isNaN(item.price)
       );
 
-      console.log("Valid items after filtering:", validItems);
-
-      // Modify the finalOrderData to ensure MongoDB compatibility
       const finalOrderData = isAdditionalOrder
         ? {
             tableId: tableId,
             items: validItems.map((item) => ({
               ...item,
-              // Ensure menuItemId is a string for MongoDB ObjectId compatibility
               menuItemId: String(item.menuItemId),
             })),
             customerCount: existingOrder?.customerCount || 1,
@@ -193,10 +169,9 @@ const MenuPage = () => {
             isUpdate: true,
           }
         : {
-            tableId: String(tableId), // Ensure tableId is a string
+            tableId: String(tableId),
             items: validItems.map((item) => ({
               ...item,
-              // Ensure menuItemId is a string for MongoDB ObjectId compatibility
               menuItemId: String(item.menuItemId),
             })),
             customerCount: 1,
@@ -204,19 +179,7 @@ const MenuPage = () => {
             isUpdate: false,
           };
 
-      // Add API version for debugging
-      console.log("API endpoint being called:", `/orders`);
-      console.log("Final order data:", JSON.stringify(finalOrderData, null, 2));
-
-      // Try using fetch directly once to see if it's an issue with makeAuthenticatedRequest
       try {
-        const API_BASE = `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000"
-        }/api`;
-        console.log("Trying direct fetch to:", `${API_BASE}/orders`);
-
-        const token = localStorage.getItem("token");
-
         const response = await makeAuthenticatedRequest("/orders", {
           method: "POST",
           headers: {
@@ -225,14 +188,9 @@ const MenuPage = () => {
           body: JSON.stringify(finalOrderData),
         });
 
-        console.log("Order submission response status:", response.status);
-
         if (response.ok) {
-          // Parse response as JSON only once
           const responseData = await response.json();
-          console.log("Success response:", responseData);
 
-          // Update table status to occupied after successful order (only for new orders)
           if (!isAdditionalOrder) {
             try {
               await makeAuthenticatedRequest(`/tables/${tableId}/status`, {
@@ -249,9 +207,13 @@ const MenuPage = () => {
           const message = isAdditionalOrder
             ? `Items added to Table ${tableInfo?.tableNumber}! Total: €${orderTotal}`
             : `Order placed for Table ${tableInfo?.tableNumber}! Total: €${orderTotal}`;
-
+          // Clear local state
+          setOrderItems([]);
+          
           alert(message);
-          navigate("/management/staff");
+          navigate("/management/staff", {
+            state: { openPaymentForTableId: processPaymentImmediately === true ? tableId : null }
+          });
         } else {
           // For error responses, use clone() before reading the body
           const clonedResponse = response.clone();
@@ -292,6 +254,8 @@ const MenuPage = () => {
           error.message || "Unknown error"
         }. Please try again.`
       );
+    } finally {
+      setShowConfirmation(false);
     }
   };
 
@@ -336,7 +300,7 @@ const MenuPage = () => {
             {orderItems.length > 0 && (
               <div className="hidden md:flex items-center justify-end text-right">
                 <button
-                  onClick={submitOrder}
+                  onClick={() => setShowConfirmation(true)}
                   className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-4 text-lg"
                 >
                   <ShoppingCart className="w-4 h-4" />
@@ -355,9 +319,72 @@ const MenuPage = () => {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Bar */}
-        <div className="mb-6">
+      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Sidebar - Selected Items (Cart) - Hidden on Mobile */}
+          <div className="hidden lg:block w-full lg:w-1/3 xl:w-1/4">
+            <div className="bg-white rounded-xl shadow-lg border border-amber-100 p-4 sticky top-4">
+              <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                <ShoppingCart className="w-5 h-5 mr-2 text-amber-600" />
+                Selected Items
+              </h2>
+              
+              {orderItems.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">
+                  <p>Your order is empty.</p>
+                  <p className="text-sm mt-2">Add items from the menu.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3">
+                    {orderItems.map((item) => (
+                      <div key={item._id} className="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100">
+                        <div className="flex-1 min-w-0 pr-2">
+                          <p className="font-semibold text-slate-800 text-sm truncate" title={item.name}>{item.name}</p>
+                          <p className="text-amber-600 font-bold text-sm">€{item.price}</p>
+                        </div>
+                        <div className="flex items-center bg-white rounded-md border border-slate-200">
+                          <button
+                            onClick={() => removeFromOrder(item._id)}
+                            className="text-red-500 hover:bg-red-50 p-1.5 transition-colors rounded-l-md"
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="font-bold text-sm min-w-[24px] text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => addToOrder(item)}
+                            className="text-green-500 hover:bg-green-50 p-1.5 transition-colors rounded-r-md"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t border-amber-200 pt-4 mt-4">
+                    <div className="flex justify-between items-center mb-4 text-lg">
+                      <span className="font-semibold text-slate-600">Total:</span>
+                      <span className="font-bold text-amber-600">€{orderTotal}</span>
+                    </div>
+                    <button
+                      onClick={() => setShowConfirmation(true)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition-colors shadow-md"
+                    >
+                      Submit Order
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Side - Menu Items */}
+          <div className="w-full lg:w-2/3 xl:w-3/4">
+            {/* Search Bar */}
+            <div className="mb-6">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
@@ -519,19 +546,80 @@ const MenuPage = () => {
             </p>
           </div>
         )}
+          </div>
+        </div>
       </main>
 
       {/* Floating Submit Order Button - only on mobile */}
       {orderItems.length > 0 && (
         <div className="md:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-xs px-4">
           <button
-            onClick={submitOrder}
+            onClick={() => setShowConfirmation(true)}
             className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg flex items-center justify-center space-x-2 text-lg transition-colors"
           >
             <ShoppingCart className="w-5 h-5" />
             <span>Submit Order</span>
             <span className="ml-2 text-base font-bold"> €{orderTotal}</span>
           </button>
+        </div>
+      )}
+      {/* Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform transition-all overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-bold text-slate-800 mb-2 flex items-center justify-center">
+              <ShoppingCart className="w-6 h-6 mr-2 text-amber-600" />
+              Confirm Order
+            </h2>
+            <p className="text-slate-500 text-center mb-6">
+              Table {tableInfo.tableNumber}
+            </p>
+
+            <div className="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100 max-h-64 overflow-y-auto">
+              <div className="space-y-3">
+                {orderItems.map((item) => (
+                  <div key={item._id} className="flex justify-between items-center text-sm">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <p className="font-semibold text-slate-700 truncate">{item.name}</p>
+                      <p className="text-slate-500">€{item.price} × {item.quantity}</p>
+                    </div>
+                    <p className="font-bold text-slate-800">
+                      €{(item.price * item.quantity).toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="border-t border-slate-200 mt-4 pt-3 flex justify-between items-center">
+                <span className="font-semibold text-slate-600">Total:</span>
+                <span className="text-xl font-bold text-amber-600">€{orderTotal}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => submitOrder(true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl transition-colors shadow-md shadow-green-200 text-lg flex items-center justify-center"
+              >
+                Confirm & Pay
+              </button>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowConfirmation(false)}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-3 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => submitOrder(false)}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-amber-200"
+                >
+                  Confirm Only
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

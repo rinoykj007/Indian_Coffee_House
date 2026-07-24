@@ -15,6 +15,34 @@ const paymentRoutes = require("./routes/payments");
 
 const app = express();
 
+// CORS Configuration
+const allowedOrigins = [
+  "https://indian-coffee-house-hxyp.vercel.app",
+  "https://indian-coffee-house-i6c5.vercel.app",
+  "https://www.payasam.ie",
+  "https://payasam.ie",
+  ...(process.env.NODE_ENV === "production"
+    ? []
+    : ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]),
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 // Security Middleware
 // Helmet - Set security headers
 app.use(
@@ -54,34 +82,6 @@ app.use("/api/auth/login", authLimiter);
 // NoSQL injection protection
 app.use(mongoSanitize());
 
-// CORS Configuration
-const allowedOrigins = [
-  "https://indian-coffee-house-hxyp.vercel.app",
-  "https://indian-coffee-house-i6c5.vercel.app",
-  "https://www.payasam.ie",
-  "https://payasam.ie",
-  ...(process.env.NODE_ENV === "development"
-    ? ["http://localhost:5173", "http://localhost:5174"]
-    : []),
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
 
 // Body parsing middleware with size limits
 app.use(express.json({ limit: "1mb" })); // Reduced from 10mb
@@ -115,6 +115,12 @@ app.use("/api/tables", tableRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/payments", paymentRoutes);
+
+// Category Management Routes
+const categoryRoutes = require("./routes/categories");
+const subcategoryRoutes = require("./routes/subcategories");
+app.use("/api/categories", categoryRoutes);
+app.use("/api/subcategories", subcategoryRoutes);
 
 // Legacy route for backward compatibility
 // app.get("/menu", async (req, res) => {

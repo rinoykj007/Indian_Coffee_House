@@ -11,7 +11,7 @@ const sampleUsers = [
   {
     username: "admin",
     email: "admin@indiancoffeehouse.ie",
-    password: "admin123",
+    password: "admin@binoy_944",
     role: "admin",
     name: "Admin User",
   },

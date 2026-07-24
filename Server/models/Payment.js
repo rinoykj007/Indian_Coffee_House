@@ -14,7 +14,6 @@ const paymentSchema = new mongoose.Schema({
   tableId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Table",
-    required: true,
   },
   orderNumber: {
     type: String, // Changed from Number to String to match the format "20250828-003"
