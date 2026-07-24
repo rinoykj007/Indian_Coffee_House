@@ -28,6 +28,7 @@ const MenuPage = () => {
   const [isLoadingExistingOrder, setIsLoadingExistingOrder] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get table info from navigation state
   const tableInfo = location.state?.table || {
@@ -188,7 +189,8 @@ const MenuPage = () => {
   };
 
   const submitOrder = async (processPaymentImmediately = false) => {
-    if (orderItems.length === 0) return;
+    if (orderItems.length === 0 || isSubmitting) return;
+    setIsSubmitting(true);
 
     if (!tableId) {
       alert("Error: No table selected. Please go back and select a table.");
@@ -316,6 +318,7 @@ const MenuPage = () => {
         }. Please try again.`
       );
     } finally {
+      setIsSubmitting(false);
       setShowConfirmation(false);
     }
   };
@@ -660,23 +663,33 @@ const MenuPage = () => {
             <div className="space-y-3">
               <button
                 onClick={() => submitOrder(true)}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl transition-colors shadow-md shadow-green-200 text-lg flex items-center justify-center"
+                disabled={isSubmitting}
+                className={`w-full text-white font-bold py-3.5 rounded-xl transition-colors shadow-md text-lg flex items-center justify-center ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-green-200'}`}
               >
-                Confirm & Pay
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Confirm & Pay"
+                )}
               </button>
               
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowConfirmation(false)}
-                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-3 rounded-xl transition-colors"
+                  disabled={isSubmitting}
+                  className={`flex-1 font-medium py-3 rounded-xl transition-colors ${isSubmitting ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => submitOrder(false)}
-                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-amber-200"
+                  disabled={isSubmitting}
+                  className={`flex-1 text-white font-bold py-3 rounded-xl transition-colors shadow-md ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 shadow-amber-200'}`}
                 >
-                  Confirm Only
+                  {isSubmitting ? "Processing..." : "Confirm Only"}
                 </button>
               </div>
             </div>
