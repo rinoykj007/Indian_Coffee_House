@@ -44,8 +44,6 @@ export const usePaymentModal = (removeBillFromState, fetchTables, fetchPendingBi
         staffId: user?._id,
       });
 
-      alert(data.message);
-      
       // Immediately remove from UI for quick feedback
       removeBillFromState(bill.tableId);
 
