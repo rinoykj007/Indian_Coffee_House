@@ -266,7 +266,6 @@ const MenuPage = () => {
           setOrderItems([]);
           localStorage.removeItem(cartStorageKey);
           
-          alert(message);
           navigate("/management/staff", {
             state: { openPaymentForTableId: processPaymentImmediately === true ? tableId : null }
           });
