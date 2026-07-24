@@ -36,8 +36,47 @@ const MenuPage = () => {
     location: "Unknown",
   };
 
-  // Get the actual table ID for API calls
   const tableId = location.state?.tableId;
+
+  // LocalStorage keys for this specific table
+  const cartStorageKey = `ich_draft_cart_${tableId || 'default'}`;
+  const menuCacheKey = 'ich_menu_cache';
+  const menuCacheTimeKey = 'ich_menu_cache_timestamp';
+
+  // Restore cart from localStorage on mount
+  useEffect(() => {
+    if (tableId) {
+      const savedCart = localStorage.getItem(cartStorageKey);
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart);
+          if (parsedCart.length > 0) {
+            setOrderItems(parsedCart);
+            // Recalculate total
+            const total = parsedCart.reduce(
+              (sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0),
+              0
+            );
+            setOrderTotal(total);
+          }
+        } catch (e) {
+          console.error("Failed to parse saved cart", e);
+        }
+      }
+    }
+  }, [tableId, cartStorageKey]);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (tableId) {
+      if (orderItems.length > 0) {
+        localStorage.setItem(cartStorageKey, JSON.stringify(orderItems));
+      } else {
+        localStorage.removeItem(cartStorageKey);
+      }
+    }
+  }, [orderItems, tableId, cartStorageKey]);
+
   useEffect(() => {
     fetchMenuItems();
 
@@ -71,13 +110,29 @@ const MenuPage = () => {
 
   const fetchMenuItems = async () => {
     try {
+      // 1. Try to load from cache first for instant UI
+      const cachedMenu = localStorage.getItem(menuCacheKey);
+      const cacheTime = localStorage.getItem(menuCacheTimeKey);
+      const isCacheValid = cacheTime && (Date.now() - parseInt(cacheTime) < 1000 * 60 * 30); // 30 min cache
+
+      if (cachedMenu && isCacheValid) {
+        setMenuItems(JSON.parse(cachedMenu));
+        setLoading(false);
+      }
+
+      // 2. Fetch fresh data in the background (or immediately if no cache)
       const response = await makeAuthenticatedRequest("/menu");
-      const data = await response.json();
-
-      const menuItemsArray = Array.isArray(data) ? data : data.menuItems || [];
-
-      setMenuItems(menuItemsArray);
+      if (response.ok) {
+        const data = await response.json();
+        const activeItems = data.items?.filter((item) => item.available) || [];
+        setMenuItems(activeItems);
+        
+        // Update cache
+        localStorage.setItem(menuCacheKey, JSON.stringify(activeItems));
+        localStorage.setItem(menuCacheTimeKey, Date.now().toString());
+      }
     } catch (error) {
+      console.error("Error fetching menu:", error);
     } finally {
       setLoading(false);
     }
@@ -207,8 +262,9 @@ const MenuPage = () => {
           const message = isAdditionalOrder
             ? `Items added to Table ${tableInfo?.tableNumber}! Total: €${orderTotal}`
             : `Order placed for Table ${tableInfo?.tableNumber}! Total: €${orderTotal}`;
-          // Clear local state
+          // Clear local state and localStorage
           setOrderItems([]);
+          localStorage.removeItem(cartStorageKey);
           
           alert(message);
           navigate("/management/staff", {
