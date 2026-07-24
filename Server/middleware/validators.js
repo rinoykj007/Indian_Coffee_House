@@ -166,6 +166,25 @@ const tableIdValidator = [
   validate,
 ];
 
+const createTableValidator = [
+  body("tableNumber")
+    .trim()
+    .notEmpty()
+    .withMessage("Table number is required")
+    .isLength({ max: 20 })
+    .withMessage("Table number must be less than 20 characters"),
+  body("capacity")
+    .isInt({ min: 1, max: 100 })
+    .withMessage("Capacity must be between 1 and 100"),
+  body("location")
+    .trim()
+    .notEmpty()
+    .withMessage("Location is required")
+    .isLength({ max: 50 })
+    .withMessage("Location must be less than 50 characters"),
+  validate,
+];
+
 module.exports = {
   loginValidator,
   registerValidator,
@@ -177,4 +196,5 @@ module.exports = {
   paymentValidator,
   tableStatusValidator,
   tableIdValidator,
+  createTableValidator,
 };

@@ -53,7 +53,7 @@ const AdminDashboard = () => {
 
       case "tables":
         return (
-          <TableManagement tables={tables} />
+          <TableManagement tables={tables} fetchTabData={fetchTabData} />
         );
 
       case "orders":
