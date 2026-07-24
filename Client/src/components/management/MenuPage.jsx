@@ -124,7 +124,13 @@ const MenuPage = () => {
       const response = await makeAuthenticatedRequest("/menu");
       if (response.ok) {
         const data = await response.json();
-        const activeItems = data.items?.filter((item) => item.available) || [];
+        
+        // Handle different response shapes safely
+        const menuItemsArray = Array.isArray(data) ? data : (data.menuItems || []);
+        
+        // Ensure we only show available items (default to true if undefined)
+        const activeItems = menuItemsArray.filter((item) => item.isAvailable !== false && item.available !== false);
+        
         setMenuItems(activeItems);
         
         // Update cache

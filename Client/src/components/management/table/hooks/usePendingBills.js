@@ -14,6 +14,7 @@ export const usePendingBills = (tables, updateTableStatus) => {
 
   // Sync table statuses based on pending bills
   const updateTablesBasedOnBills = useCallback(async (bills) => {
+    // 1. Mark tables with bills as OCCUPIED
     for (const bill of bills) {
       const table = tables.find(
         (t) => String(t._id || t.id) === String(bill.tableId)
@@ -21,6 +22,18 @@ export const usePendingBills = (tables, updateTableStatus) => {
 
       if (table && table.status === TableStatus.AVAILABLE) {
         await updateTableStatus(bill.tableId, TableStatus.OCCUPIED);
+      }
+    }
+
+    // 2. Self-healing: Mark tables without bills as AVAILABLE
+    const billTableIds = new Set(bills.map(b => String(b.tableId)));
+    for (const table of tables) {
+      if (table.status === TableStatus.OCCUPIED && !billTableIds.has(String(table._id || table.id))) {
+        try {
+          await updateTableStatus(table._id || table.id, TableStatus.AVAILABLE);
+        } catch (e) {
+          console.error("Failed to self-heal table status", e);
+        }
       }
     }
   }, [tables, updateTableStatus]);
