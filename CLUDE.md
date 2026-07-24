@@ -25,3 +25,24 @@
 - **Validation**: Subcategory uniqueness is enforced natively at the database level via a compound index `[name, parentCategory]`, and handled gracefully on the frontend.
 - **Audit Logging**: The `createdBy` and `updatedBy` fields are populated automatically by extracting the `username` from the JWT token in the `req.user` object via the existing authentication middleware.
 - **UI/UX**: Responsive modals, hover states, and standard color tokens from the existing design system were applied to ensure visual consistency.
+
+## MenuPage Refactoring
+
+### What was changed:
+1. **Frontend Architecture:**
+   - **`client/src/components/management/menu/`**: Created a modular structure for the Menu Page.
+   - **API & Services Layer**: Extracted network calls into `api/menu.api.js`.
+   - **Custom Hooks**: Extracted all state and side effects into `useMenu`, `useOrderCart`, and `useOrderSubmission` inside `hooks/`.
+   - **UI Components**: Broke down the massive 700-line JSX into 9 small, focused components inside `components/` (e.g., `MenuHeader`, `MenuCart`, `MenuGrid`, `ConfirmDialog`).
+   - **Constants & Types**: Extracted caching keys and timeout constants to `utils/menu.constants.js`.
+   - **`client/src/App.jsx`**: Updated the import to point to the new modular `screens/MenuPage.jsx`.
+   - **Deleted `client/src/components/management/MenuPage.jsx`**.
+
+### Why it was changed:
+- To transform a monolithic 700-line React component into a modular, highly scalable, and production-ready architecture.
+- Adhered strictly to SOLID principles and Clean Architecture by separating API calls, state management, and UI rendering.
+- Re-used all existing CSS classes, state variables, and application flow so that functionality and user experience remain absolutely identical to the original version.
+
+### Relevant Implementation Details:
+- Utilized barrel exports (`index.js`) across all subdirectories (`hooks`, `components`, `api`, `utils`) to dramatically simplify component imports.
+- Ensured dependency injection (e.g., passing `makeAuthenticatedRequest` to the API layer) to keep business logic purely functional and isolated from React Context when possible.
