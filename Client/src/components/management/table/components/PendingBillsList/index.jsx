@@ -17,7 +17,7 @@ const PendingBillsList = ({
         {pendingBills.length > 0 ? (
           pendingBills.map((bill) => (
             <PendingBillCard
-              key={bill.tableId}
+              key={bill.orderId || bill.id}
               bill={bill}
               reduceItemQuantity={reduceItemQuantity}
               cancelItem={cancelItem}

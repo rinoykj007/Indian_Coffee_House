@@ -11,6 +11,7 @@ import {
   Users,
   Search,
   X,
+  Loader2,
 } from "lucide-react";
 
 const MenuPage = () => {
